@@ -1,0 +1,1500 @@
+-- ============================================================
+-- 🎵 SISTEMA DE MÚSICAS CUSTOM — v52 (COMPLETO + SILVER CINEMÁTICO + LOOP SEGURO)
+-- ============================================================
+local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LogService = game:GetService("LogService")
+local UserInputService = game:GetService("UserInputService")
+local ContentProvider = game:GetService("ContentProvider")
+local LP = Players.LocalPlayer
+
+-- ============================================================
+-- ⚙️ CONFIGURAÇÃO E IDs
+-- ============================================================
+local ID_ROBOS = "rbxassetid://84148947759737"
+local ID_EGGMAN = "rbxassetid://109245181664813"
+local ID_IMG_METAL = "rbxassetid://137952937666632"
+local ID_IMG_SONIC = "rbxassetid://15527181230"
+local ID_IMG_DEAD = "rbxassetid://9903086267"
+local ID_IMG_FURY = "rbxassetid://97961237097364"
+local ID_IMG_TAILS = "rbxassetid://115426927953696"
+local ID_IMG_AMY = "rbxassetid://121858100377581"
+local ID_IMG_AMY_WIN = ""
+local ID_IMG_SONIC_RUN = "rbxassetid://87253089788771"
+local ID_IMG_LIMIT = "rbxassetid://15123356185"
+
+-- 🆕 IDs da Narrativa do Silver
+local ID_IMG_BLAZE_BG = "rbxassetid://81825919660409"
+local ID_IMG_SILVER_PROMISE = "rbxassetid://126898419831417"
+
+local EXE_FORCADO = ""
+local EXES_LMS = {
+	{ nome = "2011X", aliases = {"2011x", "sonic.exe", "sonicexe"}, img = "rbxassetid://128750884775372" },
+	{ nome = "KOLOSSOS", aliases = {"kolossos"}, img = "rbxassetid://126168447697935" },
+	{ nome = "FLEETWAY", aliases = {"fleetway", "fleety"}, img = "rbxassetid://100045874029577" },
+	{ nome = "TAILS DOLL", aliases = {"tailsdoll", "tails doll", "tripwire", "trip wire"}, img = "rbxassetid://88717022359465" },
+}
+
+local ID_ANIM_STUN = "rbxassetid://119975552824132"
+local DEBUG_PLACA = true
+local OFFSET_SONIC = 0
+
+local AZUL = Color3.fromRGB(0, 170, 255)
+local CIANO = Color3.fromRGB(130, 235, 255)
+local OURO = Color3.fromRGB(255, 205, 60)
+local VERMELHO = Color3.fromRGB(255, 45, 45)
+local FOGO = Color3.fromRGB(255, 130, 30)
+local PRATA = Color3.fromRGB(180, 220, 255)
+local ROXO_ALMA = Color3.fromRGB(180, 100, 255)
+
+local imagensParaPreload = {ID_IMG_SONIC_RUN, ID_IMG_LIMIT, ID_IMG_FURY, ID_IMG_TAILS, ID_IMG_AMY, ID_IMG_DEAD, ID_IMG_METAL, ID_ROBOS, ID_EGGMAN, ID_IMG_BLAZE_BG, ID_IMG_SILVER_PROMISE}
+task.spawn(function() pcall(function() ContentProvider:PreloadAsync(imagensParaPreload) end) end)
+
+local MUSICAS = {
+	{nome = "DAMSEL IN DISTRESS", personagem = "Amy", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/cf3cec43d96ff386893c0b7830e40476cb5f1445/Outcome_Memories_OST_-_63._DAMSEL_IN_DISTRESS_Amy_s_old_LMS_theme_(mp3.pm).mp3", arquivo = "amy_damsel.mp3", lms = "Amy", volume = 1.0, robos = {}, cor = Color3.fromRGB(255, 100, 200), legendaEstilo = "amy", placa = { inicio = 82.0, fim = 142.0 }},
+	{nome = "No Hes-EGG-tation", personagem = "Eggman", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/73d307155573a292cf81aa8a911efec546944c72/No%20Hes-EGG-tation%20(feat.%20Midwaygem).mp3", arquivo = "eggman.mp3", lms = "Eggman", volume = 1.0, robos = {63, 65, 68, 71, 76, 78, 81}, cor = Color3.fromRGB(255, 150, 50)},
+	{nome = "YOU CAN'T DO ANYTHING", personagem = "Metal Sonic", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/09ba1196d7c61721a18bff12acc96208bb8dc811/YOU%20CAN'T%20DO%20ANYTHING%20(METAL%20LMS)%20-%20FRACTURED%20GENESIS%20OST.mp3", arquivo = "metal_lms.mp3", lms = "MetalSonic", volume = 1.0, robos = {}, cor = Color3.fromRGB(0, 255, 255)},
+	{nome = "FEEL THE FURY", personagem = "Knuckles", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/e2597904d632c14ddb615cd17ed0275dbb42cf8b/ThatGuyRamon_MrGoodbarz_Martin_T._-_Feel_The_Fury_Removed_-_Outcome_Memories_OST_(mp3.pm)%20(1).mp3", arquivo = "knuckles_fury.mp3", lms = "Knuckles", volume = 1.0, robos = {}, cor = Color3.fromRGB(255, 50, 50), eventosKnuckles = true},
+	{nome = "KEEP BELIEVING", personagem = "Tails", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/e7398be5fad5f251ca9f3738923987227a1fc965/KEEP%20BELIEVING%20-%20Rounds%20Of%20Insanity%20OST%20%5BTAILS%20SOLO%20THEME%E2%A7%B8LMS%5D.mp3", arquivo = "keep_believing.mp3", lms = "Tails", volume = 1.0, robos = {}, cor = Color3.fromRGB(255, 180, 40), tailsImageTime = 80.0},
+	{nome = "DON'T BLINK JUST GO", personagem = "Sonic", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/e6288ddcef023d42f2f17755311fd62f28905bfc/Don't%20Blink%20Just%20Go%20(feat.%20Rob%20Lundgren)%20(online-audio-converter.com).mp3", arquivo = "sonic_dont_blink.mp3", lms = "Sonic", volume = 1.0, robos = {}, cor = AZUL, legendaEstilo = "sonic", eventosSonic = true},
+	-- 🆕 LMS DO SILVER (NARRATIVA CINEMÁTICA)
+	{nome = "IN YOUR DREAMS", personagem = "Silver", url = "https://raw.githubusercontent.com/ZOEIRAKOF/Custom-lms/5ebad80a495ffe620c60ef564aff8fbf94f8ae31/In%20Your%20Dreams%20(online-audio-converter.com).mp3", arquivo = "silver_in_your_dreams.mp3", lms = "Silver", volume = 1.0, robos = {}, cor = PRATA, eventosSilver = true},
+}
+
+local LETRAS = {
+	["DON'T BLINK JUST GO"] = {
+		{time = 27.6, text = "Rolling around at the speed of sound", big = true, dur = 2.2}, {time = 29.8, text = "I'm the one who's running higher"}, {time = 31.8, text = "In a flash", big = true, dur = 2.8},
+		{time = 35.0, text = "Oh, oh"}, {time = 36.7, text = "Breaking the rules, gotta push my limits"}, {time = 39.9, text = "Something in life you just can't replace"}, {time = 42.2, text = "Oh, no"},
+		{time = 43.0, text = "You can't replace, no"}, {time = 47.4, text = "You wanna dig my soul under your heel"}, {time = 52.1, text = "But in time you'll find there aren't any tricks left to pull on me"},
+		{time = 58.1, text = "Fight to be free", big = true, dur = 3.4}, {time = 62.0, text = "I'm always thinking two steps ahead"}, {time = 66.8, text = "Don't care who stands in my path, I'll never change who I am"},
+		{time = 72.6, text = "And who they all believe in, pushes me to carry on"}, {time = 77.1, text = "Carry on", echo = true}, {time = 77.8, text = "Racing to the break of dawn, fighting with the stars"},
+		{time = 82.0, text = "And I'm done"}, {time = 83.5, text = "And I'm done"}, {time = 85.4, text = "Gone, gone, gone", big = true, dur = 2.3}, {time = 87.9, text = "Yeah"}, {time = 89.7, text = ""},
+		{time = 111.2, text = "Life of the metal circuit slows me down or makes me second guess"}, {time = 116.6, text = "I'll pave my own way forward and clean up this mess"}, {time = 121.1, text = "Gotta keep on rolling"},
+		{time = 123.6, text = "Gotta keep singing my song"}, {time = 126.5, text = "It's true, you think that you're faster"}, {time = 129.9, text = "Prove me wrong", big = true, dur = 4.5},
+		{time = 135.5, text = "Lost it all, still I stand"}, {time = 137.8, text = "Lose or not, I'll die by your hand"}, {time = 142.0, text = "With the strength burning in my mind"},
+		{time = 145.4, text = "Bring your worst, I won't hold back"}, {time = 148.0, text = "You can't twist the way I feel"}, {time = 150.3, text = "I keep moving on"}, {time = 151.7, text = "No"}, {time = 154.8, text = ""},
+		{time = 176.2, text = "There's no more holding back", big = true, dur = 1.9}, {time = 178.2, text = "All the souls you've toyed with"}, {time = 180.6, text = "Senseless violence, isn't this what you wanted from me?"},
+		{time = 185.0, text = "There's no mercy left, no more"}, {time = 188.0, text = "Nothing can bring them back"}, {time = 190.2, text = "He's taken everybody, you cannot escape"},
+		{time = 193.8, text = "You cannot fool me"}, {time = 195.9, text = "Time to finish the game"}, {time = 197.9, text = "I'll break free of the chains", big = true, dur = 2.2},
+		{time = 200.2, text = "Don't hold me back from showing you what I'm made of"}, {time = 204.0, text = "What I'm made of", big = true, dur = 1.3}, {time = 205.4, text = "This is the day"},
+		{time = 207.9, text = "I'll take it from this place"}, {time = 210.5, text = "This is who I am"}, {time = 212.5, text = "The master of fire", big = true, dur = 3.5},
+		{time = 216.4, text = "Fire, fire", big = true, dur = 5.5}, {time = 223.5, text = "I've crossed the limit, right here", big = true, dur = 4.0}, {time = 230.5, text = "I live my own way"},
+		{time = 232.0, text = "And found my own rules"}, {time = 234.7, text = "Looking at my face, can't get my ideals now, can you?"}, {time = 237.9, text = "No"}, {time = 238.8, text = "Don't sit down and dump the pain"},
+		{time = 242.5, text = "Brings us down like a hurricane"}, {time = 244.8, text = "Live and learn", big = true, dur = 2.1}, {time = 247.0, text = "Hanging on the edge of tomorrow", big = true, dur = 2.9},
+		{time = 250.0, text = "Never go your way"}, {time = 251.7, text = "So don't blink", big = true, dur = 2.0}, {time = 253.7, text = ""},
+	},
+	["DAMSEL IN DISTRESS"] = {{time = 5.0, text = "I hear your whispers"}, {time = 9.0, text = "through the dark"}, {time = 13.0, text = "(Through the dark)", echo = true}, {time = 16.0, text = "Your heart of poison"}, {time = 20.0, text = ""}},
+	["YOU CAN'T DO ANYTHING"] = {
+		{time = 32.0, text = "HUE HUE"}, {time = 32.5, text = "HEY"}, {time = 33.0, text = "YEAH!"}, {time = 33.8, text = ""}, {time = 36.0, text = "HAHAHA"}, {time = 38.0, text = "YO HO HO"}, {time = 39.0, text = "HO!"}, {time = 39.2, text = ""},
+		{time = 76.0, text = "You can't do Anything"}, {time = 79.0, text = "so don't even try"}, {time = 80.0, text = "GET SOME HELP"}, {time = 82.0, text = ""}, {time = 83.0, text = "DON'T DO WHAT SONIC DOES"}, {time = 86.0, text = "SONIC"}, {time = 87.0, text = "DEAD OR LIVE"}, {time = 87.5, text = ""},
+		{time = 88.0, text = "IS MINE."}, {time = 88.5, text = "DEAD"}, {time = 89.0, text = "DEAD"}, {time = 89.5, text = "DEAD"}, {time = 90.0, text = "DEAD"}, {time = 90.5, text = "OR"}, {time = 91.0, text = "OR"}, {time = 91.5, text = "OR"}, {time = 92.0, text = "LIVE!"}, {time = 93.0, text = ""},
+		{time = 95.0, text = "You can't do Anything"}, {time = 97.0, text = "so don't even try"}, {time = 99.0, text = "GET SOME HELP"}, {time = 100.0, text = "HELP"}, {time = 100.5, text = "HELP"}, {time = 101.0, text = "HELP"}, {time = 101.5, text = "HELP"}, {time = 102.0, text = ""},
+		{time = 200.0, text = "HUE HUE"}, {time = 200.5, text = "HYE YEAH"}, {time = 201.5, text = "YEAH"}, {time = 203.0, text = ""},
+	},
+	["FEEL THE FURY"] = {
+		{time = 12.0, text = "C'mon, bring it!"}, {time = 27.0, text = "How are you him? Can you please explain it?"}, {time = 28.0, text = "No matter who you are, you just cannot fake it"},
+		{time = 30.0, text = "Livin' on the edge of reality"}, {time = 32.0, text = "If you mess with my friends, you gonna mess with me"}, {time = 33.0, text = "You destroy my home, you invade this land"},
+		{time = 35.0, text = "Listen real close so you understand"}, {time = 37.0, text = "I'm tougher than leather, we in this together"}, {time = 39.0, text = "You're never gonna win, team Knuckles forever!"},
+		{time = 41.0, text = "Pick up the pace, let me see what you got now"}, {time = 42.0, text = "Keep it real short, this will end, that's my vow"}, {time = 44.0, text = "No time for the fake, only real ones allowed"},
+		{time = 45.0, text = "Stand in my way, watch me tear through the crowd"}, {time = 47.0, text = "Left right, left right, left right, down", special = "LEFT_RIGHT"}, {time = 49.0, text = "Left right, left right, left right, down", special = "LEFT_RIGHT"},
+		{time = 51.0, text = "You got another thing coming if you think I'll quit"}, {time = 53.0, text = "Can you feel the fury, that primal rage?"}, {time = 56.0, text = "It holds me back every day, this urge with no release"},
+		{time = 59.0, text = "Will you feel the fury and show me what was taken"}, {time = 63.0, text = "Shaken, that had made you this way?"}, {time = 66.0, text = "Can you feel the fury that has held me back?"},
+		{time = 69.0, text = "Stopped me from seeing the way, but I won't hold back now"}, {time = 73.0, text = "Can you feel the fury? So please, just let this be"}, {time = 76.0, text = "The way that I can honor their names"},
+		{time = 95.0, text = "You can't have it all, no matter how much you want it"}, {time = 96.0, text = "Some things in life, you just can't flaunt it"}, {time = 98.0, text = "I see through, no need for the frontin'"},
+		{time = 99.0, text = "You need a mask, that's the only assumption"}, {time = 101.0, text = "The truth hits hard, but it's what you need"}, {time = 103.0, text = "Stay steady on your grind, let your actions lead"},
+		{time = 104.0, text = "No time for the fake, I'm too busy stayin' true"}, {time = 106.0, text = "Keep it real, real, real"}, {time = 108.0, text = "Time's ticking low, let's go another round"},
+		{time = 110.0, text = "Victory in sight, hear that champion sound"}, {time = 111.0, text = "Fueling up the fire, you can't keep me down"}, {time = 113.0, text = "Push past my limits turning fate all around"},
+		{time = 115.0, text = "Left right, left right, left right, down", special = "LEFT_RIGHT"}, {time = 116.0, text = "Left right, left right, left right, down", special = "LEFT_RIGHT"}, {time = 118.0, text = "If you think this is over, you're wrong"},
+		{time = 120.0, text = "We're just getting started"}, {time = 121.0, text = "Can you feel the fury, that primal rage?"}, {time = 123.0, text = "It holds me back every day, this urge with no release"},
+		{time = 127.0, text = "Will you feel the fury and show me what was taken"}, {time = 130.0, text = "Shaken, that had made you this way?"}, {time = 134.0, text = "Can you feel the fury that has held me back?"},
+		{time = 137.0, text = "Stopped me from seeing the way, but I won't hold back now"}, {time = 140.0, text = "Can you feel the fury? So please, just let this be"}, {time = 143.0, text = "The way that I can honor their names"},
+		{time = 174.0, text = "Can you feel the fury, that primal rage?"}, {time = 176.0, text = "It holds me back every day, this urge with no release"}, {time = 181.0, text = "Will you feel the fury and show me what was taken"},
+		{time = 184.0, text = "Shaken, that had made you this way?"}, {time = 188.0, text = "Can you feel the fury that has held me back?"}, {time = 191.0, text = "Stopped me from seeing the way, but I won't hold back now"},
+		{time = 194.0, text = "Can you feel the fury? So please, just let this be"}, {time = 196.0, text = "The way that I can honor their names"}, {time = 200.0, text = "Oh, oh"}, {time = 204.0, text = "Can you feel the fury?"}, {time = 207.0, text = ""},
+	},
+	["KEEP BELIEVING"] = {
+		{time = 31.0, text = "The silence buried every voice I used to know..."}, {time = 37.0, text = "Standing in this burning hell... but I still remember you."}, {time = 42.0, text = "My hands are steady now... yet I can't face this alone."},
+		{time = 47.0, text = "I'm the only one left standing in the cold unknown."}, {time = 52.0, text = "They took the rest of them... but they can't take my mind."}, {time = 57.0, text = "Every broken piece was built to leave the fear behind."},
+		{time = 62.0, text = "I was made to fall... but I taught myself to fly."}, {time = 67.0, text = "And I won't stop now... I'll make it right!"}, {time = 72.5, text = ""},
+		{time = 138.0, text = "The darkness doesn't scare me... I don't need the light."}, {time = 143.0, text = "Moving through the shadows... I know you're counting on me."}, {time = 148.0, text = "My legs are burning... but I refuse to slow my pace."},
+		{time = 153.0, text = "I'm the only spark still shining in this empty place!"}, {time = 158.0, text = "They took the rest of them... but they can't take my mind."}, {time = 163.0, text = "Every broken piece was built to leave the fear behind."},
+		{time = 168.0, text = "I was made to fall... but I taught myself to fly."}, {time = 173.0, text = "And I won't stop now... I'll make it right!"}, {time = 178.5, text = ""},
+	},
+}
+
+-- ============================================================
+-- 🔇 MUTAR SOM / DOWNLOAD
+-- ============================================================
+local mutedSounds = {}
+local function muteGameSounds()
+	mutedSounds = {}
+	local CA = game:GetService("ReplicatedStorage"):FindFirstChild("ClientAssets")
+	if not CA then return end
+	local soloTheme = CA:FindFirstChild("Sounds") and CA.Sounds:FindFirstChild("mus") and CA.Sounds.mus:FindFirstChild("Game") and CA.Sounds.mus.Game:FindFirstChild("Round") and CA.Sounds.mus.Game.Round:FindFirstChild("SoloTheme")
+	if soloTheme then
+		for _, sound in ipairs(soloTheme:GetDescendants()) do
+			if sound:IsA("Sound") and sound.Volume > 0 then
+				mutedSounds[sound] = sound.Volume
+				sound.Volume = 0
+			end
+		end
+	end
+end
+
+local function restoreGameSounds()
+	for sound, volume in pairs(mutedSounds) do
+		if sound and sound.Parent then sound.Volume = volume end
+	end
+	mutedSounds = {}
+end
+
+local function loadCustomAsset(url, filename)
+	if not isfile or not writefile or not getcustomasset then return nil end
+	if not isfile(filename) then
+		local ok, conteudo = pcall(function() return game:HttpGet(url) end)
+		if not ok or not conteudo then return nil end
+		writefile(filename, conteudo)
+	end
+	return getcustomasset(filename)
+end
+
+local musicasBaixadas = {}
+local totalBaixadas, totalFalhas = 0, 0
+for _, info in ipairs(MUSICAS) do
+	task.spawn(function()
+		local soundId = loadCustomAsset(info.url, info.arquivo)
+		if soundId then
+			local som = Instance.new("Sound")
+			som.Name = info.nome
+			som.SoundId = soundId
+			som.Looped = true -- ✅ LOOP ATIVADO
+			som.Volume = info.volume
+			som.Parent = SoundService
+			table.insert(musicasBaixadas, { som = som, info = info })
+			totalBaixadas = totalBaixadas + 1
+		else
+			totalFalhas = totalFalhas + 1
+			warn("⚠️ Falha ao baixar: " .. info.nome)
+		end
+	end)
+end
+repeat task.wait(0.5) until (totalBaixadas + totalFalhas) >= #MUSICAS
+
+-- ============================================================
+-- 🧮 ESTADO E GUI
+-- ============================================================
+local placaEstado = "off"
+local placaGroup, placaTweens, placaJaMostrada = nil, {}, false
+local contStun, contDano = 0, 0
+local sonicFeitos, knucklesFeitos, silverFeitos = {}, {}, {}
+local POS_AMY = UDim2.new(0.42, 0, 0.80, 0)
+local POS_EXE = UDim2.new(0.58, 0, 0.80, 0)
+local POS_VS  = UDim2.new(0.50, 0, 0.80, 0)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "MusicasCustomGui"; gui.ResetOnSpawn = false; gui.IgnoreGuiInset = true; gui.DisplayOrder = 500
+gui.Parent = LP:WaitForChild("PlayerGui")
+
+local painel = Instance.new("Frame")
+painel.Size = UDim2.new(0, 220, 0, 60); painel.Position = UDim2.new(0, 20, 0.85, 0)
+painel.BackgroundColor3 = Color3.fromRGB(15, 15, 25); painel.BackgroundTransparency = 0.15; painel.Visible = false
+painel.Parent = gui; Instance.new("UICorner", painel).CornerRadius = UDim.new(0, 10)
+
+local lblMusica = Instance.new("TextLabel")
+lblMusica.Size = UDim2.new(1, -20, 0, 24); lblMusica.Position = UDim2.new(0, 10, 0, 5)
+lblMusica.BackgroundTransparency = 1; lblMusica.TextColor3 = Color3.fromRGB(255, 150, 220)
+lblMusica.TextSize = 13; lblMusica.Font = Enum.Font.GothamBold; lblMusica.TextXAlignment = Enum.TextXAlignment.Left
+lblMusica.Parent = painel
+
+local lblPersonagem = Instance.new("TextLabel")
+lblPersonagem.Size = UDim2.new(1, -20, 0, 20); lblPersonagem.Position = UDim2.new(0, 10, 0, 28)
+lblPersonagem.BackgroundTransparency = 1; lblPersonagem.TextColor3 = Color3.fromRGB(200, 200, 220)
+lblPersonagem.TextSize = 11; lblPersonagem.Parent = painel
+
+local labelLetraContainer = Instance.new("Frame")
+labelLetraContainer.Size = UDim2.new(0.8, 0, 0.18, 0); labelLetraContainer.Position = UDim2.new(0.5, 0, 0.82, 0)
+labelLetraContainer.AnchorPoint = Vector2.new(0.5, 0.5); labelLetraContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+labelLetraContainer.BackgroundTransparency = 1; labelLetraContainer.Visible = false; labelLetraContainer.ZIndex = 14
+labelLetraContainer.Parent = gui; Instance.new("UICorner", labelLetraContainer).CornerRadius = UDim.new(0, 15)
+
+local labelLetra = Instance.new("TextLabel")
+labelLetra.Size = UDim2.new(1, -20, 1, -20); labelLetra.Position = UDim2.new(0.5, 0, 0.5, 0)
+labelLetra.AnchorPoint = Vector2.new(0.5, 0.5); labelLetra.BackgroundTransparency = 1
+labelLetra.TextColor3 = Color3.fromRGB(0, 255, 255); labelLetra.TextStrokeTransparency = 0
+labelLetra.TextStrokeColor3 = Color3.fromRGB(0, 50, 100); labelLetra.Font = Enum.Font.GothamBlack
+labelLetra.TextScaled = true; labelLetra.Text = ""; labelLetra.TextTransparency = 1; labelLetra.ZIndex = 15
+labelLetra.Parent = labelLetraContainer
+
+local gradLetra = Instance.new("UIGradient"); gradLetra.Rotation = 90; gradLetra.Enabled = false; gradLetra.Parent = labelLetra
+
+local estiloLegendaAtual, legendaSemFundo = nil, false
+local function aplicarEstiloLegenda(info)
+	local estilo = info.legendaEstilo or "padrao"
+	if estilo == estiloLegendaAtual then return end
+	estiloLegendaAtual = estilo
+	if estilo == "sonic" then
+		legendaSemFundo = true; labelLetra.TextScaled = false; labelLetra.TextSize = 30
+		labelLetra.Font = Enum.Font.FredokaOne; labelLetra.TextStrokeTransparency = 0.25
+		gradLetra.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 245, 255)), ColorSequenceKeypoint.new(0.45, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 100, 255))})
+		gradLetra.Enabled = true
+	elseif estilo == "amy" then
+		legendaSemFundo = true; labelLetra.TextScaled = false; labelLetra.TextSize = 26
+		labelLetra.Font = Enum.Font.Fondamento; labelLetra.TextStrokeTransparency = 0.35; gradLetra.Enabled = false
+	else
+		legendaSemFundo = false; labelLetra.TextScaled = true; labelLetra.Font = Enum.Font.GothamBlack
+		labelLetra.TextStrokeTransparency = 0; gradLetra.Enabled = false
+	end
+end
+
+local grandeFrame = Instance.new("Frame")
+grandeFrame.Size = UDim2.new(0.92, 0, 0.28, 0); grandeFrame.Position = UDim2.new(0.5, 0, 0.42, 0)
+grandeFrame.AnchorPoint = Vector2.new(0.5, 0.5); grandeFrame.BackgroundTransparency = 1
+grandeFrame.Visible = false; grandeFrame.ZIndex = 40; grandeFrame.Parent = gui
+local grandeScale = Instance.new("UIScale"); grandeScale.Scale = 1; grandeScale.Parent = grandeFrame
+local grandeLabel = Instance.new("TextLabel")
+grandeLabel.Size = UDim2.new(1, 0, 1, 0); grandeLabel.BackgroundTransparency = 1; grandeLabel.Text = ""
+grandeLabel.TextColor3 = Color3.fromRGB(255, 255, 255); grandeLabel.TextStrokeTransparency = 0
+grandeLabel.TextStrokeColor3 = Color3.fromRGB(0, 30, 80); grandeLabel.Font = Enum.Font.FredokaOne
+grandeLabel.TextScaled = true; grandeLabel.TextTransparency = 1; grandeLabel.ZIndex = 41; grandeLabel.Parent = grandeFrame
+local gradGrande = Instance.new("UIGradient")
+gradGrande.Rotation = 90
+gradGrande.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 250, 255)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 110, 255))})
+gradGrande.Parent = grandeLabel
+
+local grandeToken, grandeAtivo = 0, false
+local function esconderLetraGrande()
+	if not grandeAtivo then return end
+	grandeAtivo = false; grandeToken = grandeToken + 1; local tk = grandeToken
+	TweenService:Create(grandeLabel, TweenInfo.new(0.3), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+	TweenService:Create(grandeScale, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Scale = 0.6}):Play()
+	task.delay(0.32, function() if grandeToken == tk then grandeFrame.Visible = false end end)
+end
+
+local function mostrarLetraGrande(txt, dur)
+	dur = dur or 1.8; grandeAtivo = true; grandeToken = grandeToken + 1; local tk = grandeToken
+	grandeLabel.Text = txt; grandeFrame.Visible = true
+	grandeLabel.TextTransparency = 1; grandeLabel.TextStrokeTransparency = 1; grandeScale.Scale = 0.35
+	grandeFrame.Rotation = math.random(-5, 5)
+	TweenService:Create(grandeLabel, TweenInfo.new(0.18), {TextTransparency = 0, TextStrokeTransparency = 0}):Play()
+	TweenService:Create(grandeScale, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+	TweenService:Create(grandeFrame, TweenInfo.new(0.4), {Rotation = 0}):Play()
+	task.delay(dur, function() if grandeToken ~= tk then return end; esconderLetraGrande() end)
+end
+
+local syncLabel = Instance.new("TextLabel")
+syncLabel.Size = UDim2.new(0, 360, 0, 34); syncLabel.Position = UDim2.new(0.5, 0, 0.06, 0)
+syncLabel.AnchorPoint = Vector2.new(0.5, 0.5); syncLabel.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+syncLabel.BackgroundTransparency = 1; syncLabel.TextColor3 = CIANO; syncLabel.Font = Enum.Font.GothamBold
+syncLabel.TextSize = 17; syncLabel.Text = ""; syncLabel.TextTransparency = 1; syncLabel.ZIndex = 60; syncLabel.Parent = gui
+Instance.new("UICorner", syncLabel).CornerRadius = UDim.new(0, 8)
+local syncToken = 0
+local function mostrarSync(txt)
+	syncToken = syncToken + 1; local tk = syncToken; syncLabel.Text = txt
+	syncLabel.TextTransparency = 0; syncLabel.BackgroundTransparency = 0.25
+	task.delay(2.2, function() if syncToken ~= tk then return end; TweenService:Create(syncLabel, TweenInfo.new(0.4), {TextTransparency = 1, BackgroundTransparency = 1}):Play() end)
+end
+
+local imgFury = Instance.new("ImageLabel")
+imgFury.Size = UDim2.new(1, 0, 1, 0); imgFury.BackgroundTransparency = 1; imgFury.Image = ID_IMG_FURY
+imgFury.ScaleType = Enum.ScaleType.Crop; imgFury.ImageTransparency = 0.85; imgFury.Visible = false; imgFury.ZIndex = 1; imgFury.Parent = gui
+
+local imgTails = Instance.new("ImageLabel")
+imgTails.Size = UDim2.new(1.12, 0, 1.05, 0); imgTails.Position = UDim2.new(-0.06, 0, -0.025, 0)
+imgTails.BackgroundTransparency = 1; imgTails.Image = ID_IMG_TAILS; imgTails.ScaleType = Enum.ScaleType.Crop
+imgTails.ImageTransparency = 0.28; imgTails.Visible = false; imgTails.ZIndex = 2; imgTails.Parent = gui
+
+local function flashTela(duracao, cor)
+	duracao = duracao or 0.16
+	local flash = Instance.new("Frame")
+	flash.Size = UDim2.new(1, 0, 1, 0); flash.BackgroundColor3 = cor or Color3.fromRGB(255, 255, 255)
+	flash.BackgroundTransparency = 0; flash.BorderSizePixel = 0; flash.ZIndex = 50; flash.Parent = gui
+	TweenService:Create(flash, TweenInfo.new(duracao, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
+	task.delay(duracao + 0.05, function() if flash then flash:Destroy() end end)
+end
+
+-- ============================================================
+-- 🌸 PLACA AMY vs EXE (código completo mantido)
+-- ============================================================
+local amySide, exeSide, placaAmyImg, placaExeImg, lblAmyCont, lblExeCont, placaAmyFrame, placaExeFrame, vsLabel = nil, nil, nil, nil, nil, nil, nil, nil, nil
+
+local function matchExe(texto)
+	if texto == nil then return nil end
+	local low = tostring(texto):lower()
+	for _, exe in ipairs(EXES_LMS) do for _, alias in ipairs(exe.aliases) do if low:find(alias, 1, true) then return exe end end end
+	return nil
+end
+
+local function encontrarExeModel()
+	local pf = workspace:FindFirstChild("Players")
+	if pf then for _, modelo in ipairs(pf:GetChildren()) do if modelo:IsA("Model") and modelo:GetAttribute("Team") == "EXE" then return modelo end end end
+	return nil
+end
+
+local function detectarExe()
+	if EXE_FORCADO ~= "" then local exe = matchExe(EXE_FORCADO); if exe then return exe.nome, exe.img end end
+	local modelo = encontrarExeModel()
+	if modelo then
+		local exe = matchExe(modelo.Name); if exe then return exe.nome, exe.img end
+		local ok, attrs = pcall(function() return modelo:GetAttributes() end)
+		if ok and attrs then for _, v in pairs(attrs) do local e2 = matchExe(v); if e2 then return e2.nome, e2.img end end end
+		for _, filho in ipairs(modelo:GetChildren()) do if filho:IsA("StringValue") then local e2 = matchExe(filho.Value); if e2 then return e2.nome, e2.img end end end
+		return "2011X", EXES_LMS[1].img
+	end
+	for _, p in ipairs(Players:GetPlayers()) do if p ~= LP then local char = p.Character; local exe = matchExe(char and char.Name); if exe then return exe.nome, exe.img end end end
+	return "2011X", EXES_LMS[1].img
+end
+
+local function construirPlaca(nomeExe, imgExe)
+	placaGroup = Instance.new("CanvasGroup"); placaGroup.Name = "PlacaAmyLMS"; placaGroup.Size = UDim2.new(1, 0, 1, 0)
+	placaGroup.BackgroundTransparency = 1; placaGroup.GroupTransparency = 0; placaGroup.ZIndex = 30; placaGroup.Parent = gui
+	local function criarLado(nome, imagem, cor, pos)
+		local side = Instance.new("Frame"); side.Name = nome; side.Size = UDim2.new(0, 130, 0, 175)
+		side.AnchorPoint = Vector2.new(0.5, 0.5); side.Position = pos; side.BackgroundTransparency = 1; side.Parent = placaGroup
+		local lblNome = Instance.new("TextLabel"); lblNome.Size = UDim2.new(1, 0, 0, 18); lblNome.Position = UDim2.new(0.5, 0, 0, 0)
+		lblNome.AnchorPoint = Vector2.new(0.5, 0); lblNome.BackgroundTransparency = 1; lblNome.Text = nome
+		lblNome.TextColor3 = cor; lblNome.TextStrokeTransparency = 0; lblNome.Font = Enum.Font.GothamBold; lblNome.TextSize = 13; lblNome.Parent = side
+		local img = Instance.new("ImageLabel"); img.Size = UDim2.new(0, 100, 0, 100); img.Position = UDim2.new(0.5, 0, 0, 22)
+		img.AnchorPoint = Vector2.new(0.5, 0); img.BackgroundTransparency = 1; img.Image = imagem; img.ScaleType = Enum.ScaleType.Fit; img.Parent = side
+		local placa = Instance.new("Frame"); placa.Size = UDim2.new(0, 120, 0, 24); placa.Position = UDim2.new(0.5, 0, 1, -26)
+		placa.AnchorPoint = Vector2.new(0.5, 0); placa.BackgroundColor3 = Color3.fromRGB(18, 10, 16); placa.BackgroundTransparency = 0.25; placa.Visible = true; placa.Parent = side
+		Instance.new("UICorner", placa).CornerRadius = UDim.new(0, 6)
+		local stroke = Instance.new("UIStroke", placa); stroke.Color = cor; stroke.Thickness = 1
+		local pop = Instance.new("UIScale"); pop.Name = "Pop"; pop.Parent = placa
+		local contador = Instance.new("TextLabel"); contador.Size = UDim2.new(1, -8, 1, 0); contador.Position = UDim2.new(0.5, 0, 0.5, 0)
+		contador.AnchorPoint = Vector2.new(0.5, 0.5); contador.BackgroundTransparency = 1; contador.Text = "ACERTOS: 0"
+		contador.TextColor3 = Color3.fromRGB(255, 255, 255); contador.Font = Enum.Font.GothamBold; contador.TextSize = 11; contador.Parent = placa
+		return side, img, contador, placa
+	end
+	amySide, placaAmyImg, lblAmyCont, placaAmyFrame = criarLado("AMY", ID_IMG_AMY, Color3.fromRGB(255, 120, 200), POS_AMY)
+	exeSide, placaExeImg, lblExeCont, placaExeFrame = criarLado(nomeExe, imgExe, Color3.fromRGB(255, 70, 70), POS_EXE)
+	vsLabel = Instance.new("TextLabel"); vsLabel.Size = UDim2.new(0, 60, 0, 40); vsLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	vsLabel.Position = POS_VS; vsLabel.BackgroundTransparency = 1; vsLabel.Text = "VS"
+	vsLabel.TextColor3 = Color3.fromRGB(255, 255, 255); vsLabel.Font = Enum.Font.GothamBlack
+	vsLabel.TextSize = 22; vsLabel.TextTransparency = 1; vsLabel.TextStrokeTransparency = 1; vsLabel.Parent = placaGroup
+end
+
+local function popBadge(frame)
+	if not frame then return end; local s = frame:FindFirstChild("Pop")
+	if s then s.Scale = 1.25; TweenService:Create(s, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play() end
+end
+
+local function contarStun()
+	contStun = contStun + 1; if lblAmyCont then lblAmyCont.Text = "ACERTOS: " .. contStun end; popBadge(placaAmyFrame)
+end
+
+local function contarDano()
+	contDano = contDano + 1; if lblExeCont then lblExeCont.Text = "ACERTOS: " .. contDano end; popBadge(placaExeFrame)
+end
+
+local function mostrarPlacaAmy()
+	if placaJaMostrada then return end; placaJaMostrada = true; placaEstado = "entrando"; contStun, contDano = 0, 0
+	local nomeExe, imgExe = detectarExe(); if DEBUG_PLACA then print("[PLACA] mostrando placa | exe: " .. nomeExe) end
+	construirPlaca(nomeExe, imgExe); amySide.Position = UDim2.new(POS_AMY.X.Scale, 0, 1.25, 0); exeSide.Position = UDim2.new(POS_EXE.X.Scale, 0, 1.25, 0)
+	task.spawn(function()
+		for _ = 1, 3 do flashTela(0.16, Color3.fromRGB(255, 130, 205)); task.wait(0.24) end
+		if placaEstado ~= "entrando" or not placaGroup then return end; placaEstado = "ativa"
+		local t1 = TweenService:Create(amySide, TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = POS_AMY})
+		local t2 = TweenService:Create(exeSide, TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = POS_EXE})
+		local t3 = TweenService:Create(vsLabel, TweenInfo.new(0.4), {TextTransparency = 0, TextStrokeTransparency = 0})
+		t1:Play(); t2:Play(); t3:Play(); table.insert(placaTweens, t1); table.insert(placaTweens, t2); table.insert(placaTweens, t3)
+	end)
+end
+
+local function finalizarPlaca(vencedor)
+	if placaEstado ~= "ativa" and placaEstado ~= "entrando" then return end
+	if not placaGroup then placaEstado = "off"; return end; placaEstado = "saindo"
+	for _, tw in ipairs(placaTweens) do pcall(function() tw:Cancel() end) end; placaTweens = {}
+	local ladoVencedor = (vencedor == "amy") and amySide or exeSide
+	local ladoPerdedor = (vencedor == "amy") and exeSide or amySide
+	ladoVencedor.Position = (vencedor == "amy") and POS_AMY or POS_EXE; ladoVencedor.Rotation = 0
+	if vencedor == "amy" and ID_IMG_AMY_WIN ~= "" and placaAmyImg then placaAmyImg.Image = ID_IMG_AMY_WIN end
+	local dir = (ladoPerdedor == amySide) and -1 or 1
+	local baseX = (ladoPerdedor == amySide) and POS_AMY.X.Scale or POS_EXE.X.Scale
+	TweenService:Create(ladoPerdedor, TweenInfo.new(1.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(baseX + dir * 0.5, 0, 1.7, 0), Rotation = dir * 540}):Play()
+	if vsLabel then TweenService:Create(vsLabel, TweenInfo.new(0.5), {TextTransparency = 1, TextStrokeTransparency = 1}):Play() end
+	local corWin = (vencedor == "amy") and Color3.fromRGB(255, 215, 90) or Color3.fromRGB(255, 70, 70)
+	local win = Instance.new("TextLabel"); win.Size = UDim2.new(1, 16, 0, 34); win.Position = UDim2.new(0.5, 0, 0.5, 0)
+	win.AnchorPoint = Vector2.new(0.5, 0.5); win.BackgroundTransparency = 1; win.Text = "WIN!"
+	win.TextColor3 = corWin; win.TextStrokeTransparency = 0; win.Font = Enum.Font.GothamBlack; win.TextSize = 24; win.Parent = ladoVencedor
+	local sc = Instance.new("UIScale"); sc.Scale = 0; sc.Parent = win
+	TweenService:Create(sc, TweenInfo.new(0.55, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+	local fade = TweenService:Create(placaGroup, TweenInfo.new(4.0, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {GroupTransparency = 1})
+	fade:Play(); fade.Completed:Connect(function()
+		if placaGroup then placaGroup:Destroy(); placaGroup = nil end
+		amySide, exeSide, placaAmyImg, placaExeImg, lblAmyCont, lblExeCont, placaAmyFrame, placaExeFrame, vsLabel = nil, nil, nil, nil, nil, nil, nil, nil, nil
+		placaEstado = "off"
+	end)
+end
+
+local function esconderPlacaInstant(force)
+	if placaEstado == "saindo" and not force then return end
+	for _, tw in ipairs(placaTweens) do pcall(function() tw:Cancel() end) end; placaTweens = {}
+	if placaGroup then placaGroup:Destroy(); placaGroup = nil end; placaEstado = "off"
+end
+
+local musicaAtual = nil
+local function tocarMusica(nome)
+	for _, m in ipairs(musicasBaixadas) do m.som:Stop() end; muteGameSounds(); esconderPlacaInstant(true); placaJaMostrada = false; sonicFeitos = {}; knucklesFeitos = {}; silverFeitos = {}
+	for _, m in ipairs(musicasBaixadas) do if m.info.nome == nome then m.som:Play(); musicaAtual = m; return end end
+end
+
+local function pararTodas()
+	for _, m in ipairs(musicasBaixadas) do m.som:Stop() end; musicaAtual = nil; restoreGameSounds(); esconderPlacaInstant(false)
+end
+
+-- ============================================================
+-- 🎯 STUN REAL & CONSOLE (SEGURO)
+-- ============================================================
+local stunAtivo, ultimoStun, exeStunado = false, 0, nil
+local function detectarStunReal()
+	local exe = encontrarExeModel(); if not exe then exeStunado = nil; stunAtivo = false; return end
+	local hum = exe:FindFirstChildOfClass("Humanoid"); if not hum then return end
+	local animator = hum:FindFirstChildOfClass("Animator"); if not animator then return end
+	for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+		if track.Animation and track.Animation.AnimationId == ID_ANIM_STUN then
+			if not stunAtivo then
+				stunAtivo = true; local agora = tick()
+				if agora - ultimoStun > 0.5 then ultimoStun = agora; exeStunado = exe; if placaEstado == "ativa" then contarStun() end end
+			end
+			return
+		end
+	end
+	stunAtivo = false; exeStunado = nil
+end
+RunService.Heartbeat:Connect(function() pcall(detectarStunReal) end)
+_G.ExeStunado = function() return exeStunado ~= nil end
+_G.ExeStunadoNome = function() return exeStunado and exeStunado.Name or nil end
+
+local recentMsgs, recentCount = {}, 0
+local function processarMensagemConsole(msg)
+	msg = tostring(msg)
+	if msg:find("^%[PLACA") or msg:find("^%[SCAN") or msg:find("^%[SYNC") or msg:find("STUN REAL", 1, true) then return end
+	if placaEstado ~= "ativa" then return end
+	local agora = os.clock(); local ultimo = recentMsgs[msg]
+	if ultimo and (agora - ultimo) < 0.1 then return end
+	recentMsgs[msg] = agora; recentCount = recentCount + 1
+	if recentCount > 300 then recentMsgs = {}; recentCount = 0 end
+	local low = msg:lower(); if DEBUG_PLACA then print("[PLACA] console: " .. msg) end
+	if low:find("damage", 1, true) or low:find("dano", 1, true) then contarDano(); return end
+end
+
+local function instalarCapturaConsole()
+	local sucesso, erro = pcall(function() LogService.MessageOut:Connect(processarMensagemConsole) end)
+	if sucesso then print("[PLACA] Captura de console ativada com sucesso (Método Seguro) ✅") else warn("[PLACA] Falha: " .. tostring(erro)) end
+end
+instalarCapturaConsole()
+
+-- ============================================================
+-- 🤖 EFEITOS VISUAIS GERAIS (COMPLETO)
+-- ============================================================
+local ultimoTempoEfeito, letrasEspeciais, textoEspecialAtivo = -1, {}, false
+local furyAnterior, tailsImageAtiva, legendaVisivel, ultimaLetra, cortinaTween = false, false, false, "", nil
+
+local function tremerCamera(forca, dur)
+	task.spawn(function()
+		local nome = "SonicShake"; pcall(function() RunService:UnbindFromRenderStep(nome) end); local t0 = tick()
+		RunService:BindToRenderStep(nome, Enum.RenderPriority.Camera.Value + 1, function()
+			local t = tick() - t0; if t > dur then pcall(function() RunService:UnbindFromRenderStep(nome) end); return end
+			local cam = workspace.CurrentCamera; if not cam then return end
+			local k = forca * (1 - t / dur)
+			cam.CFrame = cam.CFrame * CFrame.new(math.random(-100,100)/100*k, math.random(-100,100)/100*k, 0) * CFrame.Angles(0, 0, math.rad(math.random(-100,100)/100*k*2))
+		end)
+	end)
+end
+
+local function linhasVelocidade(qtd, cor, dur)
+	task.spawn(function()
+		qtd = qtd or 28; dur = dur or 0.6
+		for i = 1, qtd do
+			local ang = math.rad((i/qtd)*360 + math.random(-8,8)); local f = Instance.new("Frame")
+			f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.new(0, math.random(90, 240), 0, math.random(2, 5))
+			f.BackgroundColor3 = cor; f.BorderSizePixel = 0; f.Rotation = math.deg(ang); f.ZIndex = 35; f.Parent = gui
+			f.Position = UDim2.new(0.5 + math.cos(ang)*0.10, 0, 0.5 + math.sin(ang)*0.06, 0)
+			TweenService:Create(f, TweenInfo.new(dur, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5 + math.cos(ang)*0.85, 0, 0.5 + math.sin(ang)*0.55, 0), BackgroundTransparency = 1}):Play()
+			task.delay(dur + 0.1, function() if f then f:Destroy() end end)
+		end
+	end)
+end
+
+local function aneisSonic(qtd, cor, dur)
+	task.spawn(function()
+		for i = 1, (qtd or 6) do
+			local f = Instance.new("Frame"); f.AnchorPoint = Vector2.new(0.5, 0.5); f.Position = UDim2.new(0.5, 0, 0.5, 0)
+			f.Size = UDim2.new(0, 24, 0, 24); f.BackgroundTransparency = 1; f.ZIndex = 36; f.Parent = gui
+			Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0); local st = Instance.new("UIStroke", f); st.Color = cor or OURO; st.Thickness = 5
+			local alvo = math.random(320, 760)
+			TweenService:Create(f, TweenInfo.new(dur or 0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, alvo, 0, alvo)}):Play()
+			TweenService:Create(st, TweenInfo.new(dur or 0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Transparency = 1}):Play()
+			task.delay((dur or 0.9) + 0.15, function() if f then f:Destroy() end end); task.wait(0.07)
+		end
+	end)
+end
+
+local function raio(cor, dur)
+	task.spawn(function()
+		local x = math.random(12, 88)/100; local segs = {}
+		for i = 1, 9 do
+			local f = Instance.new("Frame"); f.AnchorPoint = Vector2.new(0.5, 0.5)
+			f.Size = UDim2.new(0, math.random(3,6), 0, math.random(70, 130)); f.BackgroundColor3 = cor; f.BorderSizePixel = 0; f.Rotation = math.random(-38, 38)
+			f.Position = UDim2.new(x, 0, (i-0.5)/9, 0); f.ZIndex = 37; f.Parent = gui
+			x = math.clamp(x + math.random(-5,5)/100, 0.08, 0.92); table.insert(segs, f)
+		end
+		task.wait(dur or 0.16); for _, f in ipairs(segs) do TweenService:Create(f, TweenInfo.new(0.12), {BackgroundTransparency = 1}):Play() end
+		task.delay(0.2, function() for _, f in ipairs(segs) do if f then f:Destroy() end end end)
+	end)
+end
+
+local function barrasEQ(dur, cor)
+	task.spawn(function()
+		local holder = Instance.new("Frame"); holder.Size = UDim2.new(0.72, 0, 0.15, 0); holder.Position = UDim2.new(0.5, 0, 0.94, 0)
+		holder.AnchorPoint = Vector2.new(0.5, 0.5); holder.BackgroundTransparency = 1; holder.ZIndex = 33; holder.Parent = gui
+		local N, barras = 34, {}
+		for i = 1, N do
+			local b = Instance.new("Frame"); b.AnchorPoint = Vector2.new(0.5, 1); b.Size = UDim2.new(0, 9, 0.1, 0); b.Position = UDim2.new((i-0.5)/N, 0, 1, 0)
+			b.BackgroundColor3 = cor; b.BorderSizePixel = 0; b.Parent = holder; Instance.new("UICorner", b).CornerRadius = UDim.new(0, 3)
+			barras[i] = {f = b, alvo = 0.3, atual = 0.1}
+		end
+		local t0, conn = tick(), nil
+		conn = RunService.RenderStepped:Connect(function(dt)
+			local t = tick() - t0
+			if t > dur then conn:Disconnect(); for _, b in ipairs(barras) do TweenService:Create(b.f, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play() end; task.delay(0.5, function() holder:Destroy() end); return end
+			for i, b in ipairs(barras) do
+				if math.random() < 0.14 then b.alvo = math.random(18, 100)/100 end
+				b.atual = b.atual + (b.alvo - b.atual) * math.min(dt*14, 1)
+				local h = b.atual * (0.55 + 0.45*math.abs(math.sin(t*7 + i*0.45))); b.f.Size = UDim2.new(0, 9, math.clamp(h, 0.05, 1), 0)
+			end
+		end)
+	end)
+end
+
+local function vinheta(cor, dur, forca)
+	task.spawn(function()
+		forca = forca or 0.45
+		local defs = {{pos = UDim2.new(0,0,0,0), anc = Vector2.new(0,0), size = UDim2.new(1,0,0.20,0), rot = 90}, {pos = UDim2.new(0,0,1,0), anc = Vector2.new(0,1), size = UDim2.new(1,0,0.20,0), rot = -90}, {pos = UDim2.new(0,0,0,0), anc = Vector2.new(0,0), size = UDim2.new(0.16,0,1,0), rot = 0}, {pos = UDim2.new(1,0,0,0), anc = Vector2.new(1,0), size = UDim2.new(0.16,0,1,0), rot = 180}}
+		local frames = {}
+		for _, d in ipairs(defs) do
+			local f = Instance.new("Frame"); f.Position = d.pos; f.AnchorPoint = d.anc; f.Size = d.size
+			f.BackgroundColor3 = cor; f.BackgroundTransparency = 1; f.BorderSizePixel = 0; f.ZIndex = 32; f.Parent = gui
+			local g = Instance.new("UIGradient", f); g.Rotation = d.rot; g.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+			table.insert(frames, f); TweenService:Create(f, TweenInfo.new(0.3), {BackgroundTransparency = 1 - forca}):Play()
+		end
+		task.wait(math.max(dur - 0.6, 0.2)); for _, f in ipairs(frames) do TweenService:Create(f, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play() end
+		task.delay(0.7, function() for _, f in ipairs(frames) do if f then f:Destroy() end end end)
+	end)
+end
+
+local function brasas(qtd, cor, dur)
+	task.spawn(function()
+		for i = 1, qtd do
+			local f = Instance.new("Frame"); local tam = math.random(5, 14); f.Size = UDim2.new(0, tam, 0, tam)
+			f.AnchorPoint = Vector2.new(0.5, 0.5); f.BackgroundColor3 = cor; f.BorderSizePixel = 0; f.ZIndex = 34; f.Parent = gui
+			Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0); local x = math.random(2, 98)/100; f.Position = UDim2.new(x, 0, 1.05, 0)
+			TweenService:Create(f, TweenInfo.new(dur, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(x + math.random(-12,12)/100, 0, math.random(-10, 45)/100, 0), BackgroundTransparency = 1}):Play()
+			task.delay(dur + 0.1, function() if f then f:Destroy() end end); task.wait(0.02)
+		end
+	end)
+end
+
+local function espiral(cor, dur, qtd, vel)
+	task.spawn(function()
+		local partes = {}
+		for i = 1, (qtd or 30) do
+			local f = Instance.new("Frame"); f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.new(0, math.random(40, 130), 0, math.random(2, 5))
+			f.BackgroundColor3 = cor; f.BorderSizePixel = 0; f.ZIndex = 35; f.Parent = gui
+			partes[i] = {f = f, ang = (i/(qtd or 30))*math.pi*2, r = math.random(12, 46)/100, v = (vel or 3) * (math.random(80,120)/100)}
+		end
+		local t0, conn = tick(), nil
+		conn = RunService.RenderStepped:Connect(function()
+			local t = tick() - t0; if t > dur then conn:Disconnect(); for _, p in ipairs(partes) do if p.f then p.f:Destroy() end end; return end
+			local k = 1 - t/dur
+			for _, p in ipairs(partes) do
+				local a = p.ang + t*p.v; local r = p.r * (0.45 + 0.55*k)
+				p.f.Position = UDim2.new(0.5 + math.cos(a)*r, 0, 0.5 + math.sin(a)*r*0.6, 0); p.f.Rotation = math.deg(a) + 90; p.f.BackgroundTransparency = 1 - k*0.85
+			end
+		end)
+	end)
+end
+
+local function corrida(corA, corB)
+	task.spawn(function()
+		for i, cor in ipairs({corA, corB}) do
+			local f = Instance.new("Frame"); f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.new(0, 340, 0, 9)
+			f.BackgroundColor3 = cor; f.BorderSizePixel = 0; f.ZIndex = 35; f.Parent = gui; Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0)
+			local y = 0.34 + i*0.14; f.Position = UDim2.new(-0.3, 0, y, 0)
+			TweenService:Create(f, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {Position = UDim2.new(1.35, 0, y, 0)}):Play()
+			task.delay(0.6, function() if f then f:Destroy() end end); task.wait(0.08)
+		end
+	end)
+end
+
+local function correntes(cor, quebrarEm)
+	task.spawn(function()
+		local elos, N = {}, 13
+		for i = 1, N do
+			local f = Instance.new("Frame"); f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.new(0, 52, 0, 32); f.BackgroundTransparency = 1
+			f.Position = UDim2.new(0.12 + (i-1)*(0.76/(N-1)), 0, 0.46, 0); f.Rotation = (i % 2 == 0) and 90 or 0; f.ZIndex = 36; f.Parent = gui
+			Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0); local st = Instance.new("UIStroke", f); st.Color = cor; st.Thickness = 6; st.Transparency = 1
+			TweenService:Create(st, TweenInfo.new(0.3), {Transparency = 0}):Play(); elos[i] = {f = f, st = st}
+		end
+		task.wait(quebrarEm or 3); flashTela(0.2, Color3.fromRGB(255, 255, 255)); tremerCamera(1.2, 0.4); linhasVelocidade(26, Color3.fromRGB(220, 220, 235), 0.5)
+		for i, e in ipairs(elos) do
+			local dir = (i <= N/2) and -1 or 1
+			TweenService:Create(e.f, TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(e.f.Position.X.Scale + dir*math.random(25,70)/100, 0, 0.46 + math.random(-45,45)/100, 0), Rotation = e.f.Rotation + math.random(-400, 400)}):Play()
+			TweenService:Create(e.st, TweenInfo.new(0.9), {Transparency = 1}):Play()
+		end
+		task.delay(1.0, function() for _, e in ipairs(elos) do if e.f then e.f:Destroy() end end end)
+	end)
+end
+
+local function glitchLegenda(dur)
+	task.spawn(function()
+		local clones = {}
+		for _, c in ipairs({Color3.fromRGB(255, 40, 90), Color3.fromRGB(60, 240, 255)}) do
+			local l = Instance.new("TextLabel"); l.Size = labelLetra.Size; l.Position = labelLetra.Position; l.AnchorPoint = labelLetra.AnchorPoint
+			l.BackgroundTransparency = 1; l.Text = labelLetra.Text; l.Font = labelLetra.Font; l.TextScaled = labelLetra.TextScaled; l.TextSize = labelLetra.TextSize
+			l.TextColor3 = c; l.TextTransparency = 0.45; l.ZIndex = 16; l.Parent = labelLetraContainer; table.insert(clones, l)
+		end
+		local t0 = tick()
+		while tick() - t0 < (dur or 0.5) do
+			if clones[1] then clones[1].Position = UDim2.new(0.5, math.random(-9, 9), 0.5, math.random(-4, 4)) end
+			if clones[2] then clones[2].Position = UDim2.new(0.5, math.random(-9, 9), 0.5, math.random(-4, 4)) end
+			task.wait(0.04)
+		end
+		for _, l in ipairs(clones) do if l then l:Destroy() end end
+	end)
+end
+
+local function dispararEfeitoMetal(segInt, tempoExato)
+	if segInt == 39 then local img = Instance.new("ImageLabel"); img.Size = UDim2.new(0, 600, 0, 600); img.AnchorPoint = Vector2.new(0.5, 0.5); img.Position = UDim2.new(0.5, 0, 0.5, 0); img.BackgroundTransparency = 1; img.Image = ID_IMG_METAL; img.ScaleType = Enum.ScaleType.Fit; img.ZIndex = 5; img.Parent = gui; task.delay(0.8, function() if img then img:Destroy() end end) end
+	if segInt == 86 then local img = Instance.new("ImageLabel"); img.Size = UDim2.new(0, 500, 0, 500); img.AnchorPoint = Vector2.new(0.5, 0.5); img.Position = UDim2.new(0.5, 0, 0.5, 0); img.BackgroundTransparency = 1; img.Image = ID_IMG_SONIC; img.ScaleType = Enum.ScaleType.Fit; img.ZIndex = 1; img.Parent = gui; task.delay(1.0, function() if img then img:Destroy() end end) end
+	if segInt == 87 then local img = Instance.new("ImageLabel"); img.Size = UDim2.new(1, 0, 1, 0); img.BackgroundTransparency = 1; img.Image = ID_IMG_DEAD; img.ScaleType = Enum.ScaleType.Stretch; img.ZIndex = 10; img.Parent = gui; task.delay(1.0, function() if img then img:Destroy() end end) end
+	if segInt >= 88 and segInt < 92 then
+		local texto = (tempoExato % 0.5 < 0.25) and "DEAD" or "OR"; local cor = (texto == "DEAD") and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(0, 255, 255)
+		local lbl = Instance.new("TextLabel"); lbl.Size = UDim2.new(0, 150, 0, 50); lbl.AnchorPoint = Vector2.new(0.5, 0.5); lbl.Position = UDim2.new(math.random(10, 90)/100, 0, math.random(10, 90)/100, 0)
+		lbl.BackgroundTransparency = 1; lbl.Text = texto; lbl.TextColor3 = cor; lbl.TextStrokeTransparency = 0; lbl.Font = Enum.Font.GothamBlack; lbl.TextSize = 40; lbl.ZIndex = 20; lbl.Parent = gui
+		task.delay(0.3, function() if lbl then lbl:Destroy() end end)
+	end
+end
+
+local function animarRobosCantos()
+	local function robo(x)
+		local r = Instance.new("ImageLabel"); r.Size = UDim2.new(0, 0, 0, 0); r.AnchorPoint = Vector2.new(0.5, 0.5); r.Position = UDim2.new(x, 0, 1.5, 0)
+		r.BackgroundTransparency = 1; r.Image = ID_ROBOS; r.ScaleType = Enum.ScaleType.Fit; r.Parent = gui
+		TweenService:Create(r, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(x, 0, 0.5, 0), Size = UDim2.new(0, 600, 0, 600)}):Play()
+		task.delay(1.0, function() if r then TweenService:Create(r, TweenInfo.new(0.8), {Position = UDim2.new(x, 0, 1.5, 0), ImageTransparency = 1}):Play(); task.wait(0.9); r:Destroy() end end)
+	end
+	robo(0.2); robo(0.8)
+	local eggman = Instance.new("ImageLabel"); eggman.Size = UDim2.new(0, 300, 0, 300); eggman.AnchorPoint = Vector2.new(0.5, 0.5); eggman.Position = UDim2.new(-0.2, 0, 0.5, 0)
+	eggman.BackgroundTransparency = 1; eggman.Image = ID_EGGMAN; eggman.ScaleType = Enum.ScaleType.Fit; eggman.Parent = gui
+	TweenService:Create(eggman, TweenInfo.new(1.0, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.3, 0)}):Play()
+	task.delay(1.0, function() if eggman then TweenService:Create(eggman, TweenInfo.new(1.0), {Position = UDim2.new(1.2, 0, 0.6, 0)}):Play(); task.wait(1.0); eggman:Destroy() end end)
+end
+
+local function criarLeftRightPiscando(cor)
+	for _, lbl in ipairs(letrasEspeciais) do if lbl then lbl:Destroy() end end; letrasEspeciais = {}
+	local textos = {"LEFT", "RIGHT", "LEFT", "DOWN"}; local posicoes = {UDim2.new(0.18, 0, 0.28, 0), UDim2.new(0.82, 0, 0.28, 0), UDim2.new(0.22, 0, 0.72, 0), UDim2.new(0.78, 0, 0.72, 0)}
+	for i, txt in ipairs(textos) do
+		local lbl = Instance.new("TextLabel"); lbl.Size = UDim2.new(0, 220, 0, 90); lbl.AnchorPoint = Vector2.new(0.5, 0.5); lbl.Position = posicoes[i]
+		lbl.BackgroundTransparency = 1; lbl.Text = txt; lbl.TextColor3 = cor; lbl.TextStrokeTransparency = 0; lbl.Font = Enum.Font.GothamBlack; lbl.TextSize = 52
+		lbl.Rotation = math.random(-28, 28); lbl.ZIndex = 25; lbl.Parent = gui; table.insert(letrasEspeciais, lbl)
+		task.spawn(function()
+			while lbl and lbl.Parent do lbl.TextTransparency = 0; lbl.TextStrokeTransparency = 0; task.wait(0.12); if not lbl or not lbl.Parent then break end; lbl.TextTransparency = 0.65; lbl.TextStrokeTransparency = 0.7; task.wait(0.12) end
+		end)
+	end
+end
+
+local function iniciarMovimentoCortina()
+	if cortinaTween then cortinaTween:Cancel() end
+	task.spawn(function()
+		while imgTails.Visible do
+			cortinaTween = TweenService:Create(imgTails, TweenInfo.new(2.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Position = UDim2.new(0.02, 0, -0.025, 0)}); cortinaTween:Play(); cortinaTween.Completed:Wait()
+			if not imgTails.Visible then break end
+			cortinaTween = TweenService:Create(imgTails, TweenInfo.new(2.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Position = UDim2.new(-0.08, 0, -0.025, 0)}); cortinaTween:Play(); cortinaTween.Completed:Wait()
+		end
+	end)
+end
+
+local function pararMovimentoCortina()
+	if cortinaTween then cortinaTween:Cancel(); cortinaTween = nil end; imgTails.Position = UDim2.new(-0.06, 0, -0.025, 0)
+end
+
+local function ondaDeChoqueKnuckles(cor, qtd)
+	task.spawn(function()
+		for i = 1, (qtd or 5) do
+			local f = Instance.new("Frame")
+			f.AnchorPoint = Vector2.new(0.5, 0.5)
+			f.Position = UDim2.new(0.5, 0, 0.5, 0)
+			f.Size = UDim2.new(0, 50, 0, 50)
+			f.BackgroundTransparency = 1
+			f.ZIndex = 38
+			f.Parent = gui
+			Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0)
+			local st = Instance.new("UIStroke", f)
+			st.Color = cor or VERMELHO
+			st.Thickness = 8
+			TweenService:Create(f, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 1200, 0, 1200)}):Play()
+			TweenService:Create(st, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Transparency = 1, Thickness = 1}):Play()
+			task.delay(1.3, function() if f then f:Destroy() end end)
+			task.wait(0.15)
+		end
+	end)
+end
+
+local function efeitoFuryKnuckles()
+	tremerCamera(2.5, 0.8)
+	flashTela(0.3, VERMELHO)
+	vinheta(VERMELHO, 2.5, 0.7)
+	ondaDeChoqueKnuckles(VERMELHO, 6)
+	brasas(80, FOGO, 2.5)
+	linhasVelocidade(40, VERMELHO, 0.8)
+end
+
+local function sequenciaSonicCorrendo()
+	local run1 = Instance.new("ImageLabel")
+	run1.Size = UDim2.new(0, 500, 0, 500); run1.AnchorPoint = Vector2.new(0.5, 0.5); run1.Position = UDim2.new(-0.2, 0, 0.5, 0)
+	run1.BackgroundTransparency = 1; run1.Image = ID_IMG_SONIC_RUN; run1.ScaleType = Enum.ScaleType.Fit; run1.ZIndex = 45; run1.Parent = gui
+	linhasVelocidade(25, CIANO, 0.4); tremerCamera(0.8, 0.3)
+	TweenService:Create(run1, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+	task.delay(0.5, function()
+		if run1 then
+			linhasVelocidade(35, AZUL, 0.5); tremerCamera(1.0, 0.4)
+			TweenService:Create(run1, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1.3, 0, 0.5, 0), ImageTransparency = 1}):Play()
+			task.delay(0.6, function() if run1 then run1:Destroy() end end)
+		end
+	end)
+end
+
+local function mostrarImagemLimite(dur)
+	local img = Instance.new("ImageLabel")
+	img.Size = UDim2.new(1, 0, 1, 0); img.BackgroundTransparency = 1; img.Image = ID_IMG_LIMIT
+	img.ScaleType = Enum.ScaleType.Crop; img.ImageTransparency = 1; img.ZIndex = 42; img.Parent = gui
+	TweenService:Create(img, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageTransparency = 0.15}):Play()
+	task.delay(dur - 0.4, function()
+		if img then
+			TweenService:Create(img, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
+			task.delay(0.4, function() if img then img:Destroy() end end)
+		end
+	end)
+end
+
+local EVENTOS_SONIC = {
+	{t = 19.5, tipo = "aviso", txt = "DON'T BLINK", dur = 2.5}, {t = 24.5, tipo = "aviso", txt = "JUST GO", dur = 2.5}, {t = 27.6, tipo = "burst"},
+	{t = 31.8, tipo = "flashbranco"}, {t = 35.0, tipo = "aneis", q = 4}, {t = 36.7, tipo = "glitch"}, {t = 43.0, tipo = "vinheta", cor = "azul", dur = 2.5},
+	{t = 47.4, tipo = "vinheta", cor = "vermelho", dur = 2.2, forca = 0.5}, {t = 52.1, tipo = "burst"}, {t = 58.1, tipo = "aneis", q = 8},
+	{t = 62.0, tipo = "speedlines", dur = 3.0}, {t = 64.5, tipo = "corrida"}, {t = 66.8, tipo = "burst"}, {t = 72.6, tipo = "aneis", q = 6},
+	{t = 77.8, tipo = "vinheta", cor = "azul", dur = 3.0}, {t = 82.0, tipo = "socos", n = 1}, {t = 83.5, tipo = "socos", n = 1}, {t = 85.4, tipo = "socos", n = 1},
+	{t = 87.9, tipo = "burst"}, {t = 89.7, tipo = "solo", dur = 21.5}, {t = 111.2, tipo = "circulo"}, {t = 116.6, tipo = "burst"},
+	{t = 121.1, tipo = "speedlines", dur = 2.5}, {t = 126.5, tipo = "vinheta", cor = "azul", dur = 3.0}, {t = 128.0, tipo = "corrida"}, {t = 135.5, tipo = "burst"},
+	{t = 142.0, tipo = "vinheta", cor = "vermelho", dur = 2.5}, {t = 150.3, tipo = "sequencia_sonic_correndo"},
+	{t = 154.8, tipo = "solo", dur = 21.4}, {t = 176.2, tipo = "alerta"}, {t = 180.6, tipo = "glitch"}, {t = 185.0, tipo = "vinheta", cor = "vermelho", dur = 3.0},
+	{t = 190.2, tipo = "vinheta", cor = "vermelho", dur = 2.5}, {t = 193.8, tipo = "glitch"}, {t = 195.9, tipo = "correntes", quebrar = 2.0}, {t = 205.4, tipo = "liberdade"},
+	{t = 210.5, tipo = "burst"}, {t = 216.4, tipo = "fogo"}, {t = 223.5, tipo = "limitbreak"}, {t = 223.5, tipo = "imagem_limite", dur = 4.0},
+	{t = 230.5, tipo = "speedlines", dur = 2.5}, {t = 234.7, tipo = "vinheta", cor = "azul", dur = 2.5}, {t = 238.8, tipo = "burst"}, {t = 242.5, tipo = "furacao"}, {t = 244.8, tipo = "aneis", q = 10},
+	{t = 247.0, tipo = "vinheta", cor = "ouro", dur = 3.0}, {t = 251.7, tipo = "final"},
+}
+
+local function corPorNome(n) if n == "vermelho" then return VERMELHO elseif n == "ouro" then return OURO elseif n == "ciano" then return CIANO else return AZUL end end
+
+local function eventoSonic(ev)
+	local tipo = ev.tipo
+	if tipo == "aviso" then flashTela(0.22, CIANO); mostrarLetraGrande(ev.txt, ev.dur or 2.0); tremerCamera(0.8, 0.35); linhasVelocidade(24, AZUL, 0.6)
+	elseif tipo == "burst" then flashTela(0.16, CIANO); linhasVelocidade(32, AZUL, 0.6); tremerCamera(0.55, 0.25)
+	elseif tipo == "flashbranco" then flashTela(0.28, Color3.fromRGB(255, 255, 255)); linhasVelocidade(20, Color3.fromRGB(255,255,255), 0.45)
+	elseif tipo == "aneis" then aneisSonic(ev.q or 6, OURO, 0.9)
+	elseif tipo == "glitch" then glitchLegenda(0.55); flashTela(0.08, VERMELHO); task.delay(0.12, function() flashTela(0.08, CIANO) end); tremerCamera(0.4, 0.3)
+	elseif tipo == "vinheta" then vinheta(corPorNome(ev.cor), ev.dur or 2.5, ev.forca or 0.42)
+	elseif tipo == "speedlines" then task.spawn(function() local t0 = tick(); while tick() - t0 < (ev.dur or 2.5) do linhasVelocidade(14, AZUL, 0.5); task.wait(0.28) end end)
+	elseif tipo == "corrida" then corrida(AZUL, VERMELHO); tremerCamera(0.3, 0.2)
+	elseif tipo == "socos" then task.spawn(function() for i = 1, (ev.n or 4) do flashTela(0.1, CIANO); tremerCamera(0.9, 0.15); linhasVelocidade(18, AZUL, 0.35); task.wait(0.22) end end)
+	elseif tipo == "solo" then local dur = ev.dur or 20; barrasEQ(dur, AZUL); vinheta(AZUL, dur, 0.3); task.spawn(function() local t0 = tick(); while tick() - t0 < dur do raio(CIANO, 0.16); if math.random() < 0.28 then flashTela(0.07, CIANO) end; task.wait(math.random(22, 65)/100) end end)
+	elseif tipo == "circulo" then espiral(CIANO, 3.2, 26, 1.6); aneisSonic(3, AZUL, 1.2)
+	elseif tipo == "alerta" then vinheta(VERMELHO, 3.0, 0.6); tremerCamera(1.1, 0.6); flashTela(0.14, VERMELHO); glitchLegenda(0.6)
+	elseif tipo == "correntes" then correntes(Color3.fromRGB(190, 195, 210), ev.quebrar or 3)
+	elseif tipo == "liberdade" then flashTela(0.5, Color3.fromRGB(255, 255, 255)); aneisSonic(10, OURO, 1.1); linhasVelocidade(40, CIANO, 0.8); tremerCamera(1.3, 0.6); vinheta(OURO, 3.0, 0.4)
+	elseif tipo == "fogo" then brasas(70, FOGO, 2.2); vinheta(FOGO, 3.5, 0.45); tremerCamera(0.7, 0.5); flashTela(0.14, FOGO); task.delay(2.0, function() brasas(50, FOGO, 2.0) end)
+	elseif tipo == "limitbreak" then vinheta(OURO, 4.0, 0.55); aneisSonic(8, OURO, 1.0); task.spawn(function() for i = 1, 10 do linhasVelocidade(22, OURO, 0.45); task.wait(0.25) end end); tremerCamera(0.9, 0.5)
+	elseif tipo == "furacao" then espiral(AZUL, 3.5, 40, 5); vinheta(AZUL, 3.0, 0.4); tremerCamera(0.6, 0.8)
+	elseif tipo == "final" then flashTela(0.6, Color3.fromRGB(255, 255, 255)); aneisSonic(6, CIANO, 1.2); tremerCamera(0.8, 0.5)
+	elseif tipo == "sequencia_sonic_correndo" then sequenciaSonicCorrendo()
+	elseif tipo == "imagem_limite" then mostrarImagemLimite(ev.dur or 1.5)
+	end
+end
+
+local function eventoKnuckles(ev)
+	local tipo = ev.tipo
+	if tipo == "desafio" then flashTela(0.2, VERMELHO); tremerCamera(1.5, 0.4); linhasVelocidade(30, VERMELHO, 0.6); mostrarLetraGrande("BRING IT!", 1.5)
+	elseif tipo == "burst" then flashTela(0.15, VERMELHO); tremerCamera(1.2, 0.3); linhasVelocidade(35, VERMELHO, 0.7); brasas(40, FOGO, 1.5)
+	elseif tipo == "left_right" then tremerCamera(1.8, 0.4); flashTela(0.1, VERMELHO); linhasVelocidade(25, FOGO, 0.5)
+	elseif tipo == "fury_massivo" then efeitoFuryKnuckles(); mostrarLetraGrande("FEEL THE FURY!", 2.5)
+	elseif tipo == "fury_intenso" then tremerCamera(2.0, 0.6); flashTela(0.25, VERMELHO); vinheta(VERMELHO, 2.0, 0.6); ondaDeChoqueKnuckles(VERMELHO, 4); brasas(60, FOGO, 2.0)
+	elseif tipo == "fury_calmo" then tremerCamera(1.0, 0.5); vinheta(VERMELHO, 2.5, 0.5); linhasVelocidade(20, FOGO, 1.0)
+	elseif tipo == "emotional" then vinheta(OURO, 3.0, 0.4); tremerCamera(0.8, 0.4); aneisSonic(8, OURO, 1.2)
+	elseif tipo == "final" then flashTela(0.5, VERMELHO); tremerCamera(1.5, 0.6); vinheta(VERMELHO, 3.0, 0.6); brasas(70, FOGO, 2.5); ondaDeChoqueKnuckles(VERMELHO, 5)
+	end
+end
+
+-- ============================================================
+-- 🔮 🆕 EFEITOS VISUAIS NARRATIVOS DO SILVER (CINEMÁTICOS UPGRADE)
+-- ============================================================
+
+local function efeitoParticulasAzuis()
+	task.spawn(function()
+		tremerCamera(1.5, 0.3)
+		for i = 1, 40 do
+			local p = Instance.new("Frame")
+			p.Size = UDim2.new(0, math.random(4, 10), 0, math.random(4, 10))
+			p.BackgroundColor3 = AZUL
+			p.BorderSizePixel = 0
+			p.AnchorPoint = Vector2.new(0.5, 0.5)
+			p.Position = UDim2.new(math.random(10, 90)/100, 0, math.random(10, 90)/100, 0)
+			p.ZIndex = 35
+			p.Parent = gui
+			Instance.new("UICorner", p).CornerRadius = UDim.new(1, 0)
+			TweenService:Create(p, TweenInfo.new(math.random(15, 30)/10, Enum.EasingStyle.Linear), {
+				Position = UDim2.new(p.Position.X.Scale + math.random(-20, 20)/100, 0, p.Position.Y.Scale - math.random(10, 40)/100, 0),
+				BackgroundTransparency = 1
+			}):Play()
+			task.delay(3, function() if p then p:Destroy() end end)
+			task.wait(0.05)
+		end
+	end)
+end
+
+local function efeitoCoracaoTrancado()
+	task.spawn(function()
+		flashTela(0.1, Color3.fromRGB(255, 255, 255))
+		local heart = Instance.new("Frame")
+		heart.Size = UDim2.new(0, 120, 0, 120)
+		heart.Position = UDim2.new(0.5, 0, 0.5, 0)
+		heart.AnchorPoint = Vector2.new(0.5, 0.5)
+		heart.BackgroundTransparency = 1
+		heart.ZIndex = 45
+		heart.Parent = gui
+		
+		local c1 = Instance.new("Frame"); c1.Size = UDim2.new(0.5, 0, 0.5, 0); c1.Position = UDim2.new(0, 0, 0, 0); c1.BackgroundColor3 = Color3.fromRGB(255, 100, 150); c1.Parent = heart; Instance.new("UICorner", c1).CornerRadius = UDim.new(1,0)
+		local c2 = Instance.new("Frame"); c2.Size = UDim2.new(0.5, 0, 0.5, 0); c2.Position = UDim2.new(0.5, 0, 0, 0); c2.BackgroundColor3 = Color3.fromRGB(255, 100, 150); c2.Parent = heart; Instance.new("UICorner", c2).CornerRadius = UDim.new(1,0)
+		local c3 = Instance.new("Frame"); c3.Size = UDim2.new(1, 0, 0.5, 0); c3.Position = UDim2.new(0, 0, 0.5, 0); c3.BackgroundColor3 = Color3.fromRGB(255, 100, 150); c3.Parent = heart
+		
+		local lock = Instance.new("TextLabel")
+		lock.Size = UDim2.new(0.6, 0, 0.6, 0)
+		lock.Position = UDim2.new(0.5, 0, 0.5, 0)
+		lock.AnchorPoint = Vector2.new(0.5, 0.5)
+		lock.BackgroundTransparency = 1
+		lock.Text = "🔒"
+		lock.TextSize = 40
+		lock.TextColor3 = OURO
+		lock.ZIndex = 46
+		lock.Parent = heart
+		
+		local scale = Instance.new("UIScale", heart)
+		task.spawn(function()
+			for i = 1, 8 do
+				TweenService:Create(scale, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Scale = 1.1}):Play()
+				task.wait(0.4)
+				TweenService:Create(scale, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Scale = 1.0}):Play()
+				task.wait(0.4)
+			end
+		end)
+		
+		task.delay(8, function()
+			TweenService:Create(heart, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Rotation = 15, Position = UDim2.new(0.4, 0, 0.4, 0)}):Play()
+			TweenService:Create(lock, TweenInfo.new(0.2), {TextTransparency = 1, TextSize = 60}):Play()
+			task.wait(0.2)
+			heart:Destroy()
+			flashTela(0.3, FOGO)
+			tremerCamera(2.0, 0.6)
+			brasas(100, FOGO, 2.5)
+			linhasVelocidade(30, FOGO, 1.0)
+		end)
+	end)
+end
+
+-- 🆕 UPGRADE: Efeito Relaxante Cinemático (Dream Filter + Chromatic)
+local function efeitoRelaxante()
+	task.spawn(function()
+		-- Filtro de sonho na tela inteira
+		local dreamFilter = Instance.new("Frame")
+		dreamFilter.Size = UDim2.new(1, 0, 1, 0)
+		dreamFilter.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+		dreamFilter.BackgroundTransparency = 0.8
+		dreamFilter.BorderSizePixel = 0
+		dreamFilter.ZIndex = 8
+		dreamFilter.Parent = gui
+		
+		-- Respiração do filtro
+		task.spawn(function()
+			for i = 1, 6 do
+				TweenService:Create(dreamFilter, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.6}):Play()
+				task.wait(2)
+				TweenService:Create(dreamFilter, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.85}):Play()
+				task.wait(2)
+			end
+		end)
+		
+		-- Orbes brilhantes
+		for i = 1, 8 do
+			local orb = Instance.new("Frame")
+			orb.Size = UDim2.new(0, math.random(300, 500), 0, math.random(300, 500))
+			orb.AnchorPoint = Vector2.new(0.5, 0.5)
+			orb.Position = UDim2.new(math.random(20, 80)/100, 0, math.random(20, 80)/100, 0)
+			orb.BackgroundColor3 = CIANO
+			orb.BackgroundTransparency = 0.85
+			orb.BorderSizePixel = 0
+			orb.ZIndex = 10
+			orb.Parent = gui
+			Instance.new("UICorner", orb).CornerRadius = UDim.new(1, 0)
+			
+			local grad = Instance.new("UIGradient", orb)
+			grad.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.9), NumberSequenceKeypoint.new(0.5, 0.5), NumberSequenceKeypoint.new(1, 0.9)})
+			
+			TweenService:Create(orb, TweenInfo.new(8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(math.random(20, 80)/100, 0, math.random(20, 80)/100, 0),
+				Size = UDim2.new(0, math.random(400, 600), 0, math.random(400, 600))
+			}):Play()
+			
+			task.delay(8, function()
+				TweenService:Create(orb, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
+				task.delay(3, function() if orb then orb:Destroy() end end)
+			end)
+			task.wait(1.5)
+		end
+		
+		task.delay(14, function()
+			TweenService:Create(dreamFilter, TweenInfo.new(2), {BackgroundTransparency = 1}):Play()
+			task.delay(2, function() if dreamFilter then dreamFilter:Destroy() end end)
+		end)
+	end)
+end
+
+local function efeitoBlazeCoracoes()
+	task.spawn(function()
+		local bg = Instance.new("ImageLabel")
+		bg.Size = UDim2.new(1, 0, 1, 0)
+		bg.Image = ID_IMG_BLAZE_BG
+		bg.BackgroundTransparency = 1
+		bg.ImageTransparency = 0.85
+		bg.ScaleType = Enum.ScaleType.Crop
+		bg.ZIndex = 5
+		bg.Parent = gui
+		
+		for i = 1, 25 do
+			task.wait(0.3)
+			local h = Instance.new("TextLabel")
+			h.Size = UDim2.new(0, 30, 0, 30)
+			h.Position = UDim2.new(math.random(10, 90)/100, 0, 1.1, 0)
+			h.BackgroundTransparency = 1
+			h.Text = "❤"
+			h.TextColor3 = Color3.fromRGB(255, 150, 200)
+			h.TextSize = math.random(20, 40)
+			h.ZIndex = 6
+			h.Parent = gui
+			
+			TweenService:Create(h, TweenInfo.new(math.random(4, 7), Enum.EasingStyle.Linear), {
+				Position = UDim2.new(h.Position.X.Scale + math.random(-10, 10)/100, 0, -0.2, 0),
+				TextTransparency = 1
+			}):Play()
+			task.delay(7, function() if h then h:Destroy() end end)
+		end
+		
+		mostrarLetraGrande("You were my light...", 4.0)
+		task.wait(4.5)
+		mostrarLetraGrande("I loved you more than anything...", 4.0)
+		
+		task.delay(20, function()
+			TweenService:Create(bg, TweenInfo.new(2), {ImageTransparency = 1}):Play()
+			task.delay(2, function() if bg then bg:Destroy() end end)
+		end)
+	end)
+end
+
+-- 🆕 UPGRADE: Efeito Fúria/Breakcore "Foda" (Screen Tearing + EQ Violento)
+local function efeitoFuriaRaiva()
+	task.spawn(function()
+		local txt = Instance.new("TextLabel")
+		txt.Size = UDim2.new(0.8, 0, 0.2, 0)
+		txt.Position = UDim2.new(0.5, 0, 0.5, 0)
+		txt.AnchorPoint = Vector2.new(0.5, 0.5)
+		txt.BackgroundTransparency = 1
+		txt.Text = "He took it all from me..."
+		txt.TextColor3 = VERMELHO
+		txt.TextSize = 45
+		txt.Font = Enum.Font.FredokaOne
+		txt.TextStrokeTransparency = 0
+		txt.TextStrokeColor3 = Color3.fromRGB(50, 0, 0)
+		txt.ZIndex = 50
+		txt.Parent = gui
+		
+		task.spawn(function()
+			for i = 1, 40 do
+				txt.Position = UDim2.new(0.5 + math.random(-5, 5)/100, 0, 0.5 + math.random(-5, 5)/100, 0)
+				task.wait(0.04)
+			end
+		end)
+		
+		flashTela(0.2, VERMELHO)
+		barrasEQ(22, VERMELHO)
+		
+		-- Screen Tearing (Rasgo na tela)
+		task.spawn(function()
+			local t0 = tick()
+			while tick() - t0 < 22 do
+				local tears = math.random(3, 6)
+				for i = 1, tears do
+					local tear = Instance.new("Frame")
+					tear.Size = UDim2.new(1, 0, 0, math.random(15, 40))
+					tear.Position = UDim2.new(0, 0, math.random(0, 100)/100, 0)
+					tear.BackgroundColor3 = math.random() > 0.5 and VERMELHO or Color3.fromRGB(0, 0, 0)
+					tear.BorderSizePixel = 0
+					tear.ZIndex = 49
+					tear.Parent = gui
+					
+					local dir = math.random() > 0.5 and 1 or -1
+					TweenService:Create(tear, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+						Position = UDim2.new(dir * 0.1, 0, tear.Position.Y.Scale, 0)
+					}):Play()
+					task.delay(0.15, function() if tear then tear:Destroy() end end)
+				end
+				
+				if math.random() > 0.7 then flashTela(0.08, FOGO) end
+				task.wait(math.random(1, 4)/10)
+			end
+		end)
+		
+		-- Raios e Borda de Fogo Pulsante
+		task.spawn(function()
+			local t0 = tick()
+			local borda = Instance.new("Frame")
+			borda.Size = UDim2.new(1, 0, 1, 0)
+			borda.BackgroundTransparency = 1
+			borda.BorderSizePixel = 0
+			borda.ZIndex = 40
+			borda.Parent = gui
+			local stroke = Instance.new("UIStroke", borda)
+			stroke.Color = FOGO
+			stroke.Thickness = 15
+			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			
+			while tick() - t0 < 22 do
+				raio(FOGO, 0.15)
+				stroke.Thickness = 15 + math.random(-8, 25) -- Pulsação violenta
+				task.wait(0.08)
+			end
+			TweenService:Create(stroke, TweenInfo.new(1), {Transparency = 1}):Play()
+			TweenService:Create(txt, TweenInfo.new(1), {TextTransparency = 1}):Play()
+			task.delay(1.5, function() 
+				if borda then borda:Destroy() end
+				if txt then txt:Destroy() end
+			end)
+		end)
+	end)
+end
+
+-- 🆕 UPGRADE: Imagem com 75% de transparência + Sangue
+local function efeitoPromessaSilver()
+	task.spawn(function()
+		local img = Instance.new("ImageLabel")
+		img.Size = UDim2.new(0.95, 0, 0.95, 0)
+		img.Position = UDim2.new(0.5, 0, 0.5, 0)
+		img.AnchorPoint = Vector2.new(0.5, 0.5)
+		img.Image = ID_IMG_SILVER_PROMISE
+		img.BackgroundTransparency = 1
+		img.ImageTransparency = 0.75 -- ✅ 75% TRANSPARENTE COMO PEDIDO
+		img.ScaleType = Enum.ScaleType.Fit
+		img.ZIndex = 45
+		img.Parent = gui
+		
+		mostrarLetraGrande("I couldn't protect you...", 3.5)
+		task.wait(4)
+		mostrarLetraGrande("But I will keep my promise to avenge you.", 4.5)
+		
+		task.delay(10, function()
+			img.ImageColor3 = Color3.fromRGB(130, 130, 130) -- Fica cinza
+			
+			-- Sangue caindo
+			for i = 1, 50 do
+				task.wait(0.08)
+				local drop = Instance.new("Frame")
+				drop.Size = UDim2.new(0, math.random(3, 8), 0, math.random(20, 60))
+				drop.Position = UDim2.new(math.random(0, 100)/100, 0, -0.1, 0)
+				drop.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+				drop.BorderSizePixel = 0
+				drop.ZIndex = 46
+				drop.Parent = gui
+				Instance.new("UICorner", drop).CornerRadius = UDim.new(1, 0)
+				
+				TweenService:Create(drop, TweenInfo.new(math.random(3, 6), Enum.EasingStyle.Linear), {
+					Position = UDim2.new(drop.Position.X.Scale, 0, 1.2, 0),
+					BackgroundTransparency = 0.8
+				}):Play()
+				task.delay(6, function() if drop then drop:Destroy() end end)
+			end
+		end)
+		
+		task.delay(15, function()
+			TweenService:Create(img, TweenInfo.new(2), {ImageTransparency = 1}):Play()
+			task.delay(2, function() if img then img:Destroy() end end)
+		end)
+	end)
+end
+
+local function efeitoChuvaERaios()
+	task.spawn(function()
+		local rainHolder = Instance.new("Frame")
+		rainHolder.Size = UDim2.new(1, 0, 1, 0)
+		rainHolder.BackgroundTransparency = 1
+		rainHolder.ZIndex = 30
+		rainHolder.Parent = gui
+		
+		local t0 = tick()
+		while tick() - t0 < 43 do
+			for i = 1, 5 do
+				local drop = Instance.new("Frame")
+				drop.Size = UDim2.new(0, 2, 0, math.random(15, 30))
+				drop.Position = UDim2.new(math.random(0, 100)/100, 0, -0.05, 0)
+				drop.BackgroundColor3 = Color3.fromRGB(150, 180, 255)
+				drop.BackgroundTransparency = 0.6
+				drop.BorderSizePixel = 0
+				drop.ZIndex = 31
+				drop.Parent = rainHolder
+				
+				TweenService:Create(drop, TweenInfo.new(0.4, Enum.EasingStyle.Linear), {
+					Position = UDim2.new(drop.Position.X.Scale - 0.05, 0, 1.1, 0),
+					BackgroundTransparency = 1
+				}):Play()
+				task.delay(0.4, function() if drop then drop:Destroy() end end)
+			end
+			
+			if math.random() > 0.92 then
+				flashTela(0.15, Color3.fromRGB(200, 220, 255))
+				tremerCamera(0.8, 0.3)
+				raio(CIANO, 0.3)
+			end
+			task.wait(0.05)
+		end
+		if rainHolder then rainHolder:Destroy() end
+	end)
+end
+
+local function efeitoAlmasApoio()
+	task.spawn(function()
+		flashTela(0.5, Color3.fromRGB(255, 255, 255))
+		
+		local function criarAlma(cor, nome, frase, delay, dur)
+			task.delay(delay, function()
+				local alma = Instance.new("TextLabel")
+				alma.Size = UDim2.new(0.6, 0, 0.15, 0)
+				alma.Position = UDim2.new(0.5, 0, 0.8, 0)
+				alma.AnchorPoint = Vector2.new(0.5, 0.5)
+				alma.BackgroundTransparency = 1
+				alma.Text = frase
+				alma.TextColor3 = cor
+				alma.TextSize = 28
+				alma.Font = Enum.Font.FredokaOne
+				alma.TextStrokeTransparency = 0.5
+				alma.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+				alma.TextTransparency = 1
+				alma.ZIndex = 50
+				alma.Parent = gui
+				
+				local glow = Instance.new("UIStroke", alma)
+				glow.Color = cor
+				glow.Thickness = 2
+				glow.Transparency = 0.5
+				
+				TweenService:Create(alma, TweenInfo.new(1.5, Enum.EasingStyle.Sine), {
+					TextTransparency = 0,
+					Position = UDim2.new(0.5, 0, 0.7, 0)
+				}):Play()
+				
+				task.wait(dur)
+				TweenService:Create(alma, TweenInfo.new(2), {TextTransparency = 1, Position = UDim2.new(0.5, 0, 0.6, 0)}):Play()
+				task.delay(2, function() if alma then alma:Destroy() end end)
+			end)
+		end
+		
+		criarAlma(ROXO_ALMA, "Spirit", "We are still with you, Silver.", 0, 5)
+		criarAlma(AZUL, "Sonic", "Don't give up, buddy. Keep moving forward.", 6, 5)
+		criarAlma(Color3.fromRGB(50, 50, 50), "Shadow", "Your promise is your strength. Honor it.", 12, 5)
+		criarAlma(FOGO, "Blaze", "I believe in the future you will create.", 18, 6)
+	end)
+end
+
+-- 🆕 UPGRADE: Suspense Final Cinemático (Heartbeat + Fade to Black + Flash)
+local function suspenseFinal()
+	task.spawn(function()
+		flashTela(0.5, Color3.fromRGB(255, 255, 255))
+		
+		-- Efeito de Batimento Cardíaco na tela inteira
+		local heartbeat = Instance.new("Frame")
+		heartbeat.Size = UDim2.new(1, 0, 1, 0)
+		heartbeat.BackgroundColor3 = Color3.fromRGB(20, 0, 0)
+		heartbeat.BackgroundTransparency = 0.8
+		heartbeat.BorderSizePixel = 0
+		heartbeat.ZIndex = 45
+		heartbeat.Parent = gui
+		
+		task.spawn(function()
+			for i = 1, 8 do -- 8 batidas lentas
+				TweenService:Create(heartbeat, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {BackgroundTransparency = 0.4}):Play()
+				task.wait(0.8)
+				TweenService:Create(heartbeat, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8}):Play()
+				task.wait(1.2)
+			end
+		end)
+		
+		-- Cinzas caindo suavemente
+		task.spawn(function()
+			for i = 1, 60 do
+				task.wait(0.2)
+				local ash = Instance.new("Frame")
+				ash.Size = UDim2.new(0, math.random(2, 5), 0, math.random(2, 5))
+				ash.Position = UDim2.new(math.random(0, 100)/100, 0, -0.05, 0)
+				ash.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+				ash.BackgroundTransparency = 0.5
+				ash.BorderSizePixel = 0
+				ash.ZIndex = 46
+				ash.Parent = gui
+				Instance.new("UICorner", ash).CornerRadius = UDim.new(1, 0)
+				
+				TweenService:Create(ash, TweenInfo.new(math.random(4, 7), Enum.EasingStyle.Linear), {
+					Position = UDim2.new(ash.Position.X.Scale + math.random(-10, 10)/100, 0, 1.1, 0),
+					BackgroundTransparency = 1
+				}):Play()
+				task.delay(7, function() if ash then ash:Destroy() end end)
+			end
+		end)
+		
+		-- Fade para preto absoluto
+		task.delay(16, function()
+			local blackScreen = Instance.new("Frame")
+			blackScreen.Size = UDim2.new(1, 0, 1, 0)
+			blackScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			blackScreen.BackgroundTransparency = 1
+			blackScreen.ZIndex = 55
+			blackScreen.Parent = gui
+			TweenService:Create(blackScreen, TweenInfo.new(3), {BackgroundTransparency = 0}):Play()
+			
+			-- Flash final branco dramático
+			task.delay(3.5, function()
+				flashTela(2.5, Color3.fromRGB(255, 255, 255))
+				task.delay(2.5, function()
+					if heartbeat then heartbeat:Destroy() end
+					if blackScreen then blackScreen:Destroy() end
+				end)
+			end)
+		end)
+	end)
+end
+
+local EVENTOS_SILVER = {
+	{t = 15.0, tipo = "particulas_azuis"},
+	{t = 22.0, tipo = "coracao_trancado"},
+	{t = 67.0, tipo = "relaxante"},
+	{t = 88.0, tipo = "blaze_coracoes"},
+	{t = 111.0, tipo = "furia_raiva"},
+	{t = 133.0, tipo = "promessa_silver"},
+	{t = 145.0, tipo = "chuva_raios"},
+	{t = 187.0, tipo = "almas_apoio"},
+	{t = 232.0, tipo = "suspense_final"},
+}
+
+local function eventoSilver(ev)
+	local tipo = ev.tipo
+	if tipo == "particulas_azuis" then efeitoParticulasAzuis()
+	elseif tipo == "coracao_trancado" then efeitoCoracaoTrancado()
+	elseif tipo == "relaxante" then efeitoRelaxante()
+	elseif tipo == "blaze_coracoes" then efeitoBlazeCoracoes()
+	elseif tipo == "furia_raiva" then efeitoFuriaRaiva()
+	elseif tipo == "promessa_silver" then efeitoPromessaSilver()
+	elseif tipo == "chuva_raios" then efeitoChuvaERaios()
+	elseif tipo == "almas_apoio" then efeitoAlmasApoio()
+	elseif tipo == "suspense_final" then suspenseFinal()
+	end
+end
+
+-- ============================================================
+-- 🎚️ TECLAS DE CALIBRAÇÃO
+-- ============================================================
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp then return end; if not musicaAtual then return end
+	if input.KeyCode == Enum.KeyCode.LeftBracket then OFFSET_SONIC = OFFSET_SONIC - 0.25; mostrarSync(string.format("SYNC %.2fs", OFFSET_SONIC))
+	elseif input.KeyCode == Enum.KeyCode.RightBracket then OFFSET_SONIC = OFFSET_SONIC + 0.25; mostrarSync(string.format("SYNC %.2fs", OFFSET_SONIC))
+	elseif input.KeyCode == Enum.KeyCode.Backslash then local t = musicaAtual.som.TimePosition; mostrarSync(string.format("Tempo: %.2fs | Offset: %.2fs", t, OFFSET_SONIC)) end
+end)
+
+-- ============================================================
+-- 🔄 LOOP PRINCIPAL (COM TRAVA ANTI-PARADA REFORÇADA)
+-- ============================================================
+RunService.Heartbeat:Connect(function()
+	if musicaAtual and musicaAtual.som then
+		if not musicaAtual.som.IsPlaying then musicaAtual.som:Play() end
+
+		local tempo = musicaAtual.som.TimePosition
+		if musicaAtual.info.eventosSonic then tempo = tempo + OFFSET_SONIC end
+		local segInt = math.floor(tempo)
+
+		if segInt ~= ultimoTempoEfeito and musicaAtual.info.nome == "YOU CAN'T DO ANYTHING" then dispararEfeitoMetal(segInt, tempo); ultimoTempoEfeito = segInt end
+
+		if musicaAtual.info.robos and #musicaAtual.info.robos > 0 then
+			for _, t in ipairs(musicaAtual.info.robos) do if segInt == t and ultimoTempoEfeito ~= t then animarRobosCantos(); ultimoTempoEfeito = t; break end end
+		end
+
+		if musicaAtual.info.furyTempos then
+			local mostrarFury = false
+			for _, tempoFury in ipairs(musicaAtual.info.furyTempos) do if tempo >= tempoFury[1] and tempo <= tempoFury[2] then mostrarFury = true; break end end
+			if mostrarFury and not furyAnterior then flashTela(0.16); imgFury.Visible = true elseif not mostrarFury and furyAnterior then imgFury.Visible = false end
+			furyAnterior = mostrarFury
+		else imgFury.Visible = false; furyAnterior = false end
+
+		if musicaAtual.info.tailsImageTime then
+			if tempo >= musicaAtual.info.tailsImageTime then
+				if not tailsImageAtiva then tailsImageAtiva = true; flashTela(2.0); imgTails.Visible = true; iniciarMovimentoCortina() end
+			else if tailsImageAtiva then tailsImageAtiva = false; imgTails.Visible = false; pararMovimentoCortina() end end
+		else if tailsImageAtiva then tailsImageAtiva = false; imgTails.Visible = false; pararMovimentoCortina() end end
+
+		-- ⚡ EVENTOS SONIC
+		if musicaAtual.info.eventosSonic then
+			if tempo < 2 and next(sonicFeitos) ~= nil then sonicFeitos = {} end
+			for i, ev in ipairs(EVENTOS_SONIC) do if not sonicFeitos[i] and tempo >= ev.t then sonicFeitos[i] = true; task.spawn(eventoSonic, ev) end end
+		end
+
+		-- 🔥 EVENTOS KNUCKLES
+		if musicaAtual.info.eventosKnuckles then
+			if tempo < 2 and next(knucklesFeitos) ~= nil then knucklesFeitos = {} end
+			for i, ev in ipairs(EVENTOS_KNUCKLES) do if not knucklesFeitos[i] and tempo >= ev.t then knucklesFeitos[i] = true; task.spawn(eventoKnuckles, ev) end end
+		end
+
+		-- 🔮 EVENTOS SILVER
+		if musicaAtual.info.eventosSilver then
+			if tempo < 2 and next(silverFeitos) ~= nil then silverFeitos = {} end
+			for i, ev in ipairs(EVENTOS_SILVER) do 
+				if not silverFeitos[i] and tempo >= ev.t then 
+					silverFeitos[i] = true
+					task.spawn(eventoSilver, ev) 
+				end 
+			end
+		end
+
+		local cfgPlaca = musicaAtual.info.placa
+		if cfgPlaca then
+			if tempo >= cfgPlaca.inicio and tempo < cfgPlaca.fim and not placaJaMostrada then mostrarPlacaAmy() end
+			if tempo >= cfgPlaca.fim and (placaEstado == "ativa" or placaEstado == "entrando") then finalizarPlaca("amy") end
+		end
+
+		local letra = LETRAS[musicaAtual.info.nome]
+		if letra then
+			aplicarEstiloLegenda(musicaAtual.info); local textoAtual, textoSpecial, textoEcho, textoBig, textoDur = "", "", false, false, nil
+			for _, entrada in ipairs(letra) do if tempo >= entrada.time then textoAtual = entrada.text or ""; textoSpecial = entrada.special or ""; textoEcho = entrada.echo or false; textoBig = entrada.big or false; textoDur = entrada.dur else break end end
+
+			if estiloLegendaAtual == "sonic" then gradLetra.Offset = Vector2.new(math.sin(tempo*1.6)*0.18, 0); gradGrande.Offset = Vector2.new(math.sin(tempo*1.6)*0.18, 0) end
+
+			if textoAtual ~= "" and textoBig then
+				if textoAtual ~= ultimaLetra then ultimaLetra = textoAtual; mostrarLetraGrande(textoAtual, textoDur or 1.8) end
+				if legendaVisivel then TweenService:Create(labelLetra, TweenInfo.new(0.25), {TextTransparency = 1}):Play(); TweenService:Create(labelLetraContainer, TweenInfo.new(0.25), {BackgroundTransparency = 1}):Play(); legendaVisivel = false end
+			elseif textoAtual ~= "" then
+				esconderLetraGrande()
+				if not legendaVisivel then
+					labelLetraContainer.Visible = true; labelLetraContainer.BackgroundTransparency = 1; labelLetra.TextTransparency = 1
+					if not legendaSemFundo then TweenService:Create(labelLetraContainer, TweenInfo.new(0.25), {BackgroundTransparency = 0.35}):Play() end
+					TweenService:Create(labelLetra, TweenInfo.new(0.25), {TextTransparency = 0}):Play(); legendaVisivel = true
+				end
+				labelLetra.Text = textoAtual
+				if estiloLegendaAtual == "sonic" then local n = #textoAtual; labelLetra.TextSize = (n > 60 and 20) or (n > 45 and 24) or (n > 32 and 27) or 30; labelLetra.TextStrokeColor3 = Color3.fromRGB(0, 35, 90)
+				elseif legendaSemFundo then labelLetra.TextSize = textoEcho and 21 or 26; labelLetra.TextColor3 = Color3.fromRGB(255, 110, 200); labelLetra.TextStrokeColor3 = Color3.fromRGB(80, 15, 55)
+				else labelLetra.TextColor3 = musicaAtual.info.cor; labelLetra.TextStrokeColor3 = musicaAtual.info.cor:Lerp(Color3.new(0, 0, 0), 0.55) end
+
+				if textoSpecial == "LEFT_RIGHT" then if not textoEspecialAtivo then textoEspecialAtivo = true; criarLeftRightPiscando(musicaAtual.info.cor) end
+				else if textoEspecialAtivo then textoEspecialAtivo = false; for _, lbl in ipairs(letrasEspeciais) do if lbl then lbl:Destroy() end end; letrasEspeciais = {} end end
+
+				if textoAtual ~= ultimaLetra then
+					ultimaLetra = textoAtual; labelLetra.TextTransparency = 0.55; labelLetra.Size = UDim2.new(0.93, -20, 0.93, -20)
+					TweenService:Create(labelLetra, TweenInfo.new(0.30, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0, Size = UDim2.new(1, -20, 1, -20)}):Play()
+				end
+			else
+				esconderLetraGrande()
+				if legendaVisivel then
+					TweenService:Create(labelLetra, TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 1}):Play()
+					TweenService:Create(labelLetraContainer, TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
+					task.delay(0.6, function() if labelLetra.TextTransparency >= 0.95 then labelLetraContainer.Visible = false; labelLetra.Text = "" end end); legendaVisivel = false
+				end
+				if textoEspecialAtivo then textoEspecialAtivo = false; for _, lbl in ipairs(letrasEspeciais) do if lbl then lbl:Destroy() end end; letrasEspeciais = {} end
+				ultimaLetra = ""
+			end
+		end
+	else
+		labelLetraContainer.Visible = false; grandeFrame.Visible = false; grandeAtivo = false; imgFury.Visible = false; imgTails.Visible = false
+		legendaVisivel = false; furyAnterior = false; tailsImageAtiva = false; ultimaLetra = ""; pararMovimentoCortina(); esconderPlacaInstant()
+		if textoEspecialAtivo then textoEspecialAtivo = false; for _, lbl in ipairs(letrasEspeciais) do if lbl then lbl:Destroy() end end; letrasEspeciais = {} end
+	end
+end)
+
+-- ============================================================
+-- 🤖 LOOP AUTOMÁTICO DAS MÚSICAS (PARA AO MORRER OU ROUND ACABAR)
+-- ============================================================
+local musicaAutoAtiva, somLmsOrigem, travaAteParar = false, nil, false
+
+local function acharSoloTheme()
+	local CA = game:GetService("ReplicatedStorage"):FindFirstChild("ClientAssets")
+	return CA and CA:FindFirstChild("Sounds") and CA.Sounds:FindFirstChild("mus") and CA.Sounds.mus:FindFirstChild("Game") and CA.Sounds.mus.Game:FindFirstChild("Round") and CA.Sounds.mus.Game.Round:FindFirstChild("SoloTheme")
+end
+
+local function algumLmsTocando(soloTheme)
+	for _, som in ipairs(soloTheme:GetChildren()) do if som:IsA("Sound") and som.IsPlaying then return true end end
+	return false
+end
+
+local function estouVivo()
+	local c = LP.Character; if not c then return false end; local h = c:FindFirstChildOfClass("Humanoid")
+	if not h or h.Health <= 0 then return false end; if not c:IsDescendantOf(workspace) then return false end; if c.Name == "Nenhum" then return false end; return true
+end
+
+local function pararLms(motivo)
+	if placaEstado == "ativa" or placaEstado == "entrando" then finalizarPlaca(estouVivo() and "amy" or "exe") end
+	pararTodas(); painel.Visible = false; musicaAutoAtiva = false; somLmsOrigem = nil; travaAteParar = true
+	pcall(function() RunService:UnbindFromRenderStep("SonicShake") end); if DEBUG_PLACA then print("[PLACA] LMS parada: " .. motivo) end
+end
+
+task.spawn(function()
+	while true do
+		task.wait(0.5); local soloTheme = acharSoloTheme()
+		if not soloTheme then if musicaAutoAtiva then pararLms("SoloTheme sumiu") end; continue end
+		if travaAteParar then if not algumLmsTocando(soloTheme) then travaAteParar = false end; continue end
+		
+		-- ✅ VERIFICAÇÃO DUPLA DE SEGURANÇA NO LOOP PRINCIPAL
+		if musicaAutoAtiva then
+			if not estouVivo() then 
+				pararLms("morri / char removido") 
+				continue
+			end
+			
+			local gp = workspace:FindFirstChild("GameProperties")
+			local time = gp and gp:FindFirstChild("Time")
+			if time and time.Value <= 0 then
+				pararLms("GameProperties.Time acabou")
+				continue
+			end
+
+			local fonteParou = (not somLmsOrigem) or (not somLmsOrigem.Parent) or (not somLmsOrigem.IsPlaying)
+			if fonteParou then 
+				pararLms("som da LMS parou (fim de round)") 
+			end
+			continue
+		end
+		
+		local lmsTocando, lmsInfo = nil, nil
+		for _, info in ipairs(MUSICAS) do
+			for _, som in ipairs(soloTheme:GetChildren()) do
+				if som:IsA("Sound") and som.Name:lower():find(info.lms:lower()) and som.IsPlaying then lmsTocando = som; lmsInfo = info; break end
+			end
+			if lmsTocando then break end
+		end
+		if lmsTocando and lmsInfo and estouVivo() then
+			tocarMusica(lmsInfo.nome); somLmsOrigem = lmsTocando; lblMusica.Text = lmsInfo.nome; lblPersonagem.Text = "🎭 " .. lmsInfo.personagem; painel.Visible = true; musicaAutoAtiva = true
+		end
+	end
+end)
+
+print("✅ v52 COMPLETO Carregado! SILVER CINEMÁTICO + LOOP SEGURO + PARADA NO FIM DO ROUND.")
+print("🎚️ Sync: [ = tarde | ] = cedo | \\ = ver tempo")
